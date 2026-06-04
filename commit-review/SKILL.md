@@ -15,10 +15,10 @@ Depth is always targeted — inspect only files and symbols touched by the commi
 
 Before starting:
 
-1. Check memory for a saved report directory path (`code-review.report_dir`).
+1. Check memory for a saved report directory path for the current project (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
 2. If found, use it only as the output destination. Do not read or list existing reports unless explicitly asked.
 3. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as `code-review.report_dir`, write report as `YYYY-MM-DD-commit-<hash>-review.md`.
+   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `YYYY-MM-DD-commit-<hash>-review.md`.
    - No path: output directly. Ask again next time.
 
 ## Workflow
