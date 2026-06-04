@@ -41,7 +41,7 @@ Before starting:
 8. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
 9. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`. Use `Unknown` only after reasonable evidence-gathering has failed or is blocked.
 10. Record exact commands, tools, observed output, temporary artifacts created, and cleanup status. Do not claim tests passed unless they ran in the current review.
-11. Draft output from `fixtures/report-template.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
+11. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Preserve its heading names, heading order, table shapes, field names, and final recommendation choices exactly. Do not add alternate report structures or prompt-specific sections from other instructions. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
 
 ## Finding Rules
 
