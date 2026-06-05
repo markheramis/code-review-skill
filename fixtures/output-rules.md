@@ -14,5 +14,5 @@
 10. Prefer `Approve with follow-ups` when only non-blocking `Low` or `Medium` findings remain.
 11. Include no more than one recommendation per finding unless alternatives are explicitly useful.
 12. Every finding should have a validation path.
-13. Record audit tools, checks, temporary validation artifacts, and cleanup status when they were used.
+13. Record audit tools, code intelligence, checks, repository documentation, RAG/context systems, external documentation, temporary validation artifacts, and cleanup status when they were used.
 14. Remove example-only finding blocks unless replacing them with real, evidenced findings.

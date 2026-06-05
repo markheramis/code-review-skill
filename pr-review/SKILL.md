@@ -38,15 +38,17 @@ Before starting:
 2. Read PR description and linked issues first. Verify the diff actually addresses the stated goal. Note any mismatch between description and implementation.
 3. Calibrate depth using the size table above.
 4. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
-5. Inspect changed files surgically: symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
-6. Run independent audit tools concurrently: type check, linter, tests for affected modules, dependency audit if lock files changed.
-7. Check existing reviewer comments — do not duplicate concerns already raised and acknowledged.
-8. Gather evidence in order: PR diff, CI output, tool results, surrounding source context, linked issue requirements.
-9. When unsure, prove or disprove — run targeted tests, static analysis, or small repros.
-10. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
-11. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
-12. Record exact commands, tools, output, and cleanup status. Do not claim tests passed unless run in this review.
-13. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. End with one template-defined final recommendation.
+5. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
+6. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
+7. Inspect changed files surgically: symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
+8. Run independent tools, checks, and research tasks concurrently.
+9. Check existing reviewer comments — do not duplicate concerns already raised and acknowledged.
+10. Gather evidence in order: PR diff, CI output, tool results, code intelligence results, repository and external documentation, surrounding source context, linked issue requirements.
+11. When unsure, prove or disprove — run targeted tests, static analysis, or small repros.
+12. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
+13. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
+14. Record exact commands, tools, output, research sources, and cleanup status. Do not claim tests passed unless run in this review.
+15. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. End with one template-defined final recommendation.
 
 ## Finding Rules
 

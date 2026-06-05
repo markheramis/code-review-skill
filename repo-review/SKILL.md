@@ -39,13 +39,15 @@ Before starting:
 2. Triage risk surface using the priority order above. Identify the highest-risk areas before inspecting any code.
 3. Check the report directory (if known) for prior reviews — use them to understand what was already covered and focus effort on what is new or changed.
 4. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
-5. Where tools are independent — security scan, dependency audit, type check, build, and test run are typically independent — run them concurrently.
-6. Inspect surgically in priority order: project structure, symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
-7. When unsure, prove or disprove — run targeted tests, build checks, static analysis, or small repros.
-8. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
-9. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`. Use `Unknown` only after reasonable evidence-gathering has failed or is blocked.
-10. Record exact commands, tools, observed output, temporary artifacts created, and cleanup status. Do not claim tests passed unless they ran in the current review.
-11. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
+5. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
+6. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
+7. Where tools, checks, and research tasks are independent, run them concurrently.
+8. Inspect surgically in priority order: project structure, symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
+9. When unsure, prove or disprove — run targeted tests, build checks, static analysis, or small repros.
+10. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
+11. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`. Use `Unknown` only after reasonable evidence-gathering has failed or is blocked.
+12. Record exact commands, tools, observed output, temporary artifacts created, research sources, and cleanup status. Do not claim tests passed unless they ran in the current review.
+13. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
 
 ## Finding Rules
 

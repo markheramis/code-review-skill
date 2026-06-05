@@ -1,6 +1,6 @@
 # Language and Runtime Audit Checklist
 
-Reference during workflow step 2 when inventorying available tools.
+Reference when inventorying available review tools.
 Run any command that is available and safe in the current environment.
 
 ## Rust

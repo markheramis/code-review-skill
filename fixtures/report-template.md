@@ -88,12 +88,18 @@ Validation methods used:
 ```text
 Static inspection: {Yes/No}
 Tests executed: {Yes/No}
+Code intelligence used:
+- {tool_or_capability}
 Audit tools used:
 - {tool_or_check}
 Commands run:
 - {command}
 Temporary artifacts:
 - {path_or_none} ({removed | retained_with_reason | not_applicable})
+Repository documentation checked:
+- {doc_or_none}
+RAG/context systems used:
+- {system_or_none}
 External documentation checked:
 - {doc_or_spec}
 ```
@@ -281,6 +287,23 @@ Choose one:
 
 ```text
 {tool_or_check}
+```
+
+### Code Intelligence Used
+
+```text
+{tool_or_capability}
+```
+
+### Research Sources
+
+```text
+Repository documentation:
+- {doc_or_none}
+RAG/context systems:
+- {system_or_none}
+External documentation:
+- {doc_or_spec}
 ```
 
 ### Temporary Validation Artifacts

@@ -27,28 +27,30 @@ Work one finding at a time. Do not start the next finding until the current one 
 1. Pick the highest-priority Open finding from the report's `## Findings Summary` table. Priority order: Critical → High → Medium → Low → Informational.
 2. Update its Status to `In-Progress` in both `## Findings Summary` and the finding block. Write the modified report back to disk.
 3. Analyze: read the finding's Evidence, Root Cause, and Recommendation. Confirm the issue still exists in the current codebase before fixing.
-4. Plan the fix: identify the minimal change needed. Prefer targeted edits over rewrites.
-5. Implement the fix.
-6. Write or update targeted tests covering the changed behavior. Tests must pass and achieve high coverage of the changed code paths.
-7. Run the full test suite to verify no existing behavior is broken.
-8. Update relevant documentation to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
-9. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference the report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
-10. Push the branch.
-11. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name and commit hash. Write the modified report back to disk.
-12. Repeat from step 1 for the next Open finding.
+4. Research supporting context for this finding: search repository documentation first; if a RAG or context-retrieval system is available, query it for relevant project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior needed to remediate accurately.
+5. Plan the fix: identify the minimal change needed. Prefer targeted edits over rewrites. Use the research context to validate the intended behavior, API contracts, compatibility constraints, and security implications.
+6. Implement the fix.
+7. Write or update targeted tests covering the changed behavior. Tests must pass and achieve high coverage of the changed code paths.
+8. Run the full test suite to verify no existing behavior is broken.
+9. Update relevant documentation to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
+10. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference the report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
+11. Push the branch.
+12. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name, commit hash, validation performed, and research sources used. Write the modified report back to disk.
+13. Repeat from step 1 for the next Open finding.
 
-**When tests are unavailable:** If the project has no test infrastructure, skip steps 6–7. Document the omission in `#### Remediation Notes`.
+**When tests are unavailable:** If the project has no test infrastructure, skip steps 7–8. Document the omission in `#### Remediation Notes`.
 
 ## Finding Rules
 
 - Only fix findings that are `Open` or `In-Progress`. Do not touch `Completed`, `Accepted Risk`, or `Needs Verification`.
 - Trust the original review's Evidence, Root Cause, and Recommendation. If the finding appears wrong (already fixed, not reproducible, misunderstood the code), do not silently skip — mark it `Needs Verification` with a note explaining why.
+- Use supplementary research to remediate the current finding accurately. Do not broaden into a new audit or introduce unrelated fixes.
 - After all Open findings are resolved, print a summary: total fixed, skipped, and any remaining.
 - Do not introduce new findings. If you spot a new issue while fixing, note it in `#### Remediation Notes` for the current finding and suggest running a review skill again.
 
 ## Output Discipline
 
-- Record exact commands, tools, and cleanup status for each fix.
+- Record exact commands, tools, repository documentation, RAG/context systems, external documentation, and cleanup status for each fix.
 - Do not claim tests passed unless they were run in this remediation session.
 - The report file is the source of truth — always write status updates back to it immediately.
 

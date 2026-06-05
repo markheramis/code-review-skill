@@ -28,14 +28,16 @@ Before starting:
 
 1. Run `git show <hash>` (or `git show HEAD`) to obtain the full diff. Record the commit hash, author, date, and message.
 2. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
-3. For each changed file: read the diff, identify touched symbols, trace to callers and tests. Assess correctness and security of the specific change.
-4. Run independent audit tools concurrently: type check, linter, tests for affected modules, dependency audit if lock files changed.
-5. Gather evidence in order: commit diff, tool output, surrounding source context, git log for affected files.
-6. When unsure, prove or disprove — run targeted tests, static analysis, or small repros.
-7. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
-8. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
-9. Record exact commands, tools, output, and cleanup status. Do not claim tests passed unless run in this review.
-10. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
+3. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
+4. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
+5. For each changed file: read the diff, identify touched symbols, trace to callers and tests. Assess correctness and security of the specific change.
+6. Run independent tools, checks, and research tasks concurrently.
+7. Gather evidence in order: commit diff, tool output, code intelligence results, repository and external documentation, surrounding source context, git log for affected files.
+8. When unsure, prove or disprove — run targeted tests, static analysis, or small repros.
+9. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
+10. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
+11. Record exact commands, tools, output, research sources, and cleanup status. Do not claim tests passed unless run in this review.
+12. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
 
 ## Finding Rules
 
