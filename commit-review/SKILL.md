@@ -16,10 +16,13 @@ Depth is always targeted — inspect only files and symbols touched by the commi
 Before starting:
 
 1. Check memory for a saved report directory path for the current project (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
-2. If found, use it only as the output destination. Do not read or list existing reports unless explicitly asked.
-3. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `YYYY-MM-DD-HHmm-commit-<hash>-review.md`.
+2. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
+   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `commit-<hash>-review-YYYY-MM-DD-HHmm.md`.
    - No path: output directly. Ask again next time.
+3. If report directory is known, glob for `commit-<hash>-review-*.md` in that directory. For each match (sorted oldest-first), surgically read: `## Executive Summary`, `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
+   - Avoid re-confirming findings already marked Completed in prior reviews.
+   - Elevate findings previously marked Low confidence that may now have more evidence.
+   - Note findings recurring across multiple reviews.
 
 ## Workflow
 

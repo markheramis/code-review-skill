@@ -124,6 +124,8 @@ External documentation checked:
 | F-003 | Low | High | Testing | {Finding title} | Open |
 | F-004 | Medium | High | Performance | {Finding title} | Open |
 
+Valid Status values: `Open` · `In-Progress` · `Completed` · `Accepted Risk` · `Needs Verification`
+
 ## Findings
 
 ### F-001: {Finding Title}
@@ -131,7 +133,7 @@ External documentation checked:
 **Severity:** {Critical | High | Medium | Low | Informational}
 **Confidence:** {High | Medium | Low}
 **Category:** {Security | Correctness | Reliability | Performance | Maintainability | Architecture | Testing | Observability | Documentation | Compliance}
-**Status:** {Open | Fixed | Accepted Risk | Needs Verification}
+**Status:** {Open | In-Progress | Completed | Accepted Risk | Needs Verification}
 
 #### Summary
 
@@ -277,6 +279,21 @@ List confirmed strengths that materially improve confidence.
 | P1 | F-002 | {action} | {owner_or_TBD} | {test_or_check} |
 | P2 | F-003 | {action} | {owner_or_TBD} | {test_or_check} |
 | P2 | F-004 | {action} | {owner_or_TBD} | {test_or_check} |
+
+## Remediation Workflow
+
+Use this workflow to resolve findings. Work one finding at a time. Do not start the next finding until the current one is committed.
+
+1. Pick the highest-priority Open finding from the Remediation Plan. Update its Status to `In-Progress` in both `## Findings Summary` and the finding block.
+2. Analyze the finding: read the Evidence, Root Cause, and Recommendation sections. Confirm the issue still exists in the current codebase.
+3. Plan the fix: identify the minimal change needed. Prefer targeted edits over rewrites.
+4. Implement the fix.
+5. Write or update targeted tests covering the changed behavior. Tests must pass and must achieve high coverage of the changed code paths.
+6. Run the full test suite to verify no existing behavior is broken.
+7. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference this report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
+8. Push the branch.
+9. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name and commit hash.
+10. Repeat from step 1 for the next Open finding.
 
 ## Final Recommendation
 

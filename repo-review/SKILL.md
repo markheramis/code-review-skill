@@ -24,10 +24,14 @@ Stop when all identified high-risk surfaces have been assessed and a confirming 
 Before starting:
 
 1. Check memory for a saved report directory path for the current project (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
-2. If found, read existing repo-review reports in that directory as supplemental history. Use them to understand prior coverage, open risks, and already-reviewed areas; never let report history override current repository source, build output, or test evidence.
-3. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `YYYY-MM-DD-HHmm-repo-review.md`.
+2. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
+   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `repo-review-YYYY-MM-DD-HHmm.md`.
    - No path: output directly. Ask again next time.
+3. If report directory is known, glob for `repo-review-*.md` in that directory. For each match (sorted oldest-first), surgically read: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
+   - Build a map of which areas (modules, entry points, trust boundaries) have already been assessed.
+   - Skip re-reviewing already-confirmed findings unless new evidence changes the picture.
+   - Focus the current review on: areas listed in Excluded/Limitations, areas changed since the last review (cross-check with git log), and previously Low-confidence findings.
+   - Record coverage progress — note in the new report's Scope/Excluded what prior reviews already covered.
 
 ## Workflow
 

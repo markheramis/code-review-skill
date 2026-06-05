@@ -23,11 +23,14 @@ Start from the diff only. Expand to additional files only for symbols directly t
 
 Before starting:
 
-1. Check memory for a saved report directory path (`code-review.report_dir`).
-2. If found, use it only as the output destination. Do not read or list existing reports unless explicitly asked.
-3. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as `code-review.report_dir`, write report as `YYYY-MM-DD-HHmm-branch-<name>-review.md`.
+1. Check memory for a saved report directory path (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
+2. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
+   - Path provided: save to memory as `code-review.report_dir`, write report as `branch-<name>-review-YYYY-MM-DD-HHmm.md`.
    - No path: output directly. Ask again next time.
+3. If report directory is known, glob for `branch-<name>-review-*.md` in that directory. For each match (sorted oldest-first), surgically read: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
+   - Understand which files and modules were already covered.
+   - Avoid repeating confirmed findings; focus inspection on areas listed in Excluded or Limitations.
+   - Prioritize any previously Low-confidence findings that warrant re-examination.
 
 ## Workflow
 
