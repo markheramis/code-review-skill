@@ -193,7 +193,7 @@ Add or update tests for:
 
 #### Remediation Notes
 
-{Optional implementation notes, migration concerns, compatibility concerns, or rollout considerations.}
+{Optional implementation notes, migration concerns, compatibility concerns, or rollout considerations. When remediated: include the branch name and commit hash of the fix (e.g., `bugfix/foo-bar` — `abc1234`).}
 
 ---
 
