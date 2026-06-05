@@ -296,7 +296,9 @@ Use this workflow to resolve findings. Work one finding at a time. Do not start 
 10. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name and commit hash.
 11. Repeat from step 1 for the next Open finding.
 
-> Note: skip 5 and 6 if test infrastructure is not in place in the current project.
+**Notes:**
+- Steps 5 and 6 may be skipped if the project has no test infrastructure in place. Document the omission in `#### Remediation Notes`.
+- Always branch from the default branch. Exception: if a finding's fix depends on changes from another finding's branch, branch from that finding's branch instead — and note the dependency.
 
 ## Final Recommendation
 
