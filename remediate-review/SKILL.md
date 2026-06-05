@@ -26,11 +26,11 @@ Work one finding at a time. Do not start the next finding until the current one 
 
 1. Pick the highest-priority Open finding from the report's `## Findings Summary` table. Priority order: Critical → High → Medium → Low → Informational.
 2. Update its Status to `In-Progress` in both `## Findings Summary` and the finding block. Write the modified report back to disk.
-3. Analyze: read the finding's Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, How This Helps, and Suggested Test Coverage. Confirm the issue still exists in the current codebase before fixing. If an older report lacks Remediation Analysis or How This Helps, derive them from the evidence and research before changing code.
+3. Analyze: read the finding's Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, How This Helps, and Suggested Test Coverage. Confirm the issue still exists in the current codebase before fixing. For runtime-behavior findings, prefer the smallest safe executable check: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the reported edge case. If an older report lacks Remediation Analysis or How This Helps, derive them from the evidence and research before changing code.
 4. Research supporting context for this finding: search repository documentation first; if a RAG or context-retrieval system is available, query it for relevant project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior needed to remediate accurately.
 5. Plan the fix: identify the minimal change needed and the expected project benefit. Prefer targeted edits over rewrites. Use the research context to validate the intended behavior, API contracts, compatibility constraints, performance expectations, test strategy, and security implications.
 6. Implement the fix.
-7. Write or update targeted tests covering the changed behavior. Tests must pass and achieve high coverage of the changed code paths.
+7. Write or update targeted tests covering the changed behavior. Promote any useful temporary repro into a real regression test when it is stable, maintainable, and within scope. Tests must pass and achieve high coverage of the changed code paths.
 8. Run the full test suite to verify no existing behavior is broken.
 9. Update relevant documentation to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
 10. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference the report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
@@ -45,6 +45,7 @@ Work one finding at a time. Do not start the next finding until the current one 
 
 - Only fix findings that are `Open` or `In-Progress`. Do not touch `Completed`, `Accepted Risk`, or `Needs Verification`.
 - Trust the original review's Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, and How This Helps. If the finding appears wrong (already fixed, not reproducible, misunderstood the code), do not silently skip — mark it `Needs Verification` with a note explaining why.
+- Temporary repro files are validation artifacts. Keep them isolated, delete them after use unless promoted into committed tests, and record the cleanup status.
 - Use supplementary research to remediate the current finding accurately. Do not broaden into a new audit or introduce unrelated fixes.
 - Preserve the finding's intended benefit. If implementation evidence changes the expected security, performance, complexity, coverage, feature, or project-quality impact, update `#### Remediation Notes` clearly.
 - After all Open findings are resolved, print a summary: total fixed, skipped, and any remaining.

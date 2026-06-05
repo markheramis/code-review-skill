@@ -90,6 +90,8 @@ Validation methods used:
 ```text
 Static inspection: {Yes/No}
 Tests executed: {Yes/No}
+Runtime repros attempted: {Yes/No/Not applicable}
+- {repro_command_or_reason}
 Code intelligence used:
 - {tool_or_capability}
 Audit tools used:

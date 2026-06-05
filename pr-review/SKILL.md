@@ -59,10 +59,12 @@ Before starting:
 10. Check existing reviewer comments — do not duplicate concerns already raised and acknowledged.
 11. Gather evidence in order: PR diff, CI output, tool results, coverage output, code intelligence results, repository and external documentation, surrounding source context, linked issue requirements.
 12. When unsure, prove or disprove — run targeted tests, static analysis, coverage checks, or small repros.
-13. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
-14. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
-15. Record exact commands, tools, coverage tooling checked, output, research sources, and cleanup status. Do not claim tests or coverage checks passed unless run in this review.
-16. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `## Report Output Rules`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. Before writing the report, perform a template compliance pass: compare the draft against `fixtures/report-template.md`, restore any missing section, heading, table, or appendix item, and fill not-applicable areas with `None found`, `Not reviewed`, or `Unknown` plus a brief reason. End with one template-defined final recommendation.
+13. For suspected runtime-behavior findings, try the smallest safe executable check before confirming the issue: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the suspected edge case. Use the actual implementation under review; do not mock away the behavior being tested.
+14. If a small executable repro is feasible but was not run, do not present the concern as confirmed. Assign lower confidence and state the missing validation.
+15. Keep temporary validation artifacts isolated in a safe path. Remove after use unless promoting them into real regression tests. If retained, say why.
+16. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
+17. Record exact commands, tools, coverage tooling checked, output, research sources, temporary artifacts created, and cleanup status. Do not claim tests or coverage checks passed unless run in this review.
+18. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `## Report Output Rules`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. Before writing the report, perform a template compliance pass: compare the draft against `fixtures/report-template.md`, restore any missing section, heading, table, or appendix item, and fill not-applicable areas with `None found`, `Not reviewed`, or `Unknown` plus a brief reason. End with one template-defined final recommendation.
 
 ## Report Output Rules
 
@@ -83,7 +85,7 @@ These rules govern report production. Do not include them in the report output.
 13. Prefer `Request changes` when there are confirmed `High` or `Critical` findings.
 14. Prefer `Approve with follow-ups` when only non-blocking `Low` or `Medium` findings remain.
 15. Include no more than one recommendation per finding unless alternatives are explicitly useful.
-16. Every finding should have a validation path.
+16. Every finding should have a validation path. Behavior-facing findings should include an executable reproduction when feasible, or explain why it was not safe or practical.
 17. Every finding should include `Remediation Analysis` and `How This Helps`. If the benefit or remediation path is not yet proven, state the remaining uncertainty instead of guessing.
 18. Always include `## Test Coverage Review`. Check whether project coverage tools are present by inspecting scripts, dependency manifests, coverage config, CI config, and relevant language tooling. Run available, relevant, and safe coverage commands; if none are present or execution is blocked, explain that instead of omitting the section.
 19. Record audit tools, coverage tools checked, code intelligence, checks, repository documentation, RAG/context systems, external documentation, temporary validation artifacts, and cleanup status when they were used.
@@ -97,6 +99,7 @@ These rules govern report production. Do not include them in the report output.
 - Assign category: `Security`, `Correctness`, `Reliability`, `Performance`, `Maintainability`, `Architecture`, `Testing`, `Feature`, `Observability`, `Documentation`, or `Compliance`.
 - Include exact paths, symbols, and line references when possible.
 - For each finding: summary, evidence, impact, reproduction or validation, root cause, researched remediation analysis, recommendation, how it helps, suggested tests.
+- For suspected runtime bugs, prefer direct code/test/log/repro evidence. Do not elevate a code-reading hypothesis to a confirmed bug when a small safe repro was feasible but skipped.
 - For security findings: exploitability, affected trust boundary, sensitive assets, realistic risk.
 - For optimization findings: affected hot path, cost driver, expected improvement, and validation or measurement path.
 - For complexity-reduction, testing, and feature-improvement findings: current pain, proposed improvement, evidence it matters, and concrete project benefit.
