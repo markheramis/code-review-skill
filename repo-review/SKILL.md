@@ -26,7 +26,7 @@ Before starting:
 1. Check memory for a saved report directory path for the current project (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
 2. If found, read existing repo-review reports in that directory as supplemental history. Use them to understand prior coverage, open risks, and already-reviewed areas; never let report history override current repository source, build output, or test evidence.
 3. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `YYYY-MM-DD-repo-review.md`.
+   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `YYYY-MM-DD-HHmm-repo-review.md`.
    - No path: output directly. Ask again next time.
 
 ## Workflow
