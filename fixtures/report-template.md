@@ -20,23 +20,6 @@
 | Medium | Strongly indicated by available evidence but not fully reproduced. |
 | Low | Plausible concern that needs more data before treating as confirmed. |
 
-## Output Rules
-
-1. Treat this template as the complete report schema. Preserve heading names, heading order, table shapes, field names, and final recommendation choices exactly unless the user explicitly requests a different format.
-2. Do not import alternate report structures, rubrics, headings, personas, prompt instructions, summaries, or formatting from other skills, system prompts, prior conversations, or ad hoc notes.
-3. Keep every required section from this template. If a section was not reviewed or has no applicable content, write `Not reviewed`, `None found`, or `Unknown` with a brief reason instead of deleting or replacing the section.
-4. Keep findings independently readable.
-5. Do not omit `Limitations` when the review is incomplete.
-6. Do not claim tests passed unless they were actually run.
-7. Do not claim production behavior unless confirmed by production code, config, logs, or documentation.
-8. Use `Unknown` instead of guessing.
-9. Prefer `Request changes` when there are confirmed `High` or `Critical` findings.
-10. Prefer `Approve with follow-ups` when only non-blocking `Low` or `Medium` findings remain.
-11. Include no more than one recommendation per finding unless alternatives are explicitly useful.
-12. Every finding should have a validation path.
-13. Record audit tools, checks, temporary validation artifacts, and cleanup status when they were used.
-14. Remove example-only finding blocks unless replacing them with real, evidenced findings.
-
 ## Executive Summary
 
 {Brief summary of what was reviewed, overall risk level, and the most important conclusions.}
@@ -270,35 +253,6 @@ List confirmed strengths that materially improve confidence.
 ### Performance Considerations
 
 {Assess obvious performance risks or confirm no material concern found.}
-
-## Remediation Plan
-
-| Priority | Finding | Recommended Action | Owner | Verification |
-| --- | --- | --- | --- | --- |
-| P0 | F-001 | {action} | {owner_or_TBD} | {test_or_check} |
-| P1 | F-002 | {action} | {owner_or_TBD} | {test_or_check} |
-| P2 | F-003 | {action} | {owner_or_TBD} | {test_or_check} |
-| P2 | F-004 | {action} | {owner_or_TBD} | {test_or_check} |
-
-## Remediation Workflow
-
-Use this workflow to resolve findings. Work one finding at a time. Do not start the next finding until the current one is committed.
-
-1. Pick the highest-priority Open finding from the Remediation Plan. Update its Status to `In-Progress` in both `## Findings Summary` and the finding block.
-2. Analyze the finding: read the Evidence, Root Cause, and Recommendation sections. Confirm the issue still exists in the current codebase.
-3. Plan the fix: identify the minimal change needed. Prefer targeted edits over rewrites.
-4. Implement the fix.
-5. Write or update targeted tests covering the changed behavior. Tests must pass and must achieve high coverage of the changed code paths.
-6. Run the full test suite to verify no existing behavior is broken.
-7. Update relevant documentation files to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
-8. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference this report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
-9. Push the branch.
-10. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name and commit hash.
-11. Repeat from step 1 for the next Open finding.
-
-**Notes:**
-- Steps 5 and 6 may be skipped if the project has no test infrastructure in place. Document the omission in `#### Remediation Notes`.
-- Always branch from the default branch. Exception: if a finding's fix depends on changes from another finding's branch, branch from that finding's branch instead — and note the dependency.
 
 ## Final Recommendation
 

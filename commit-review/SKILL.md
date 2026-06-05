@@ -35,7 +35,7 @@ Before starting:
 7. Keep temporary validation artifacts isolated in a safe path. Remove after use. If retained, say why.
 8. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
 9. Record exact commands, tools, output, and cleanup status. Do not claim tests passed unless run in this review.
-10. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Preserve its heading names, heading order, table shapes, field names, and final recommendation choices exactly. Do not add alternate report structures or prompt-specific sections from other instructions. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
+10. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `fixtures/output-rules.md`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings.
 
 ## Finding Rules
 
@@ -52,5 +52,6 @@ Before starting:
 
 ## Resources
 
-- `fixtures/report-template.md`: audit report template with severity/confidence scales and output rules.
+- `fixtures/report-template.md`: audit report template with severity/confidence scales.
+- `fixtures/output-rules.md`: rules governing report production (apply but do not include in output).
 - `fixtures/lang-checklist.md`: language- and runtime-specific audit commands.

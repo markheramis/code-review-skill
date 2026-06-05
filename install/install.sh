@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Installs code-review sub-skills to agent harness skills directories.
-# Each sub-skill gets its own directory with a copy of shared fixtures.
+# Each sub-skill gets its own directory with a copy of shared fixtures and scripts.
 #
 # Usage:
 #   ./install.sh                    # install to all detected harnesses
@@ -14,7 +14,8 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FIXTURES_SOURCE="$REPO_ROOT/fixtures"
-SUB_SKILLS=(commit-review branch-review pr-review repo-review)
+SCRIPTS_SOURCE="$REPO_ROOT/scripts/get-reports.py"
+SUB_SKILLS=(commit-review branch-review pr-review repo-review remediate-review)
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified: claude, codex, cursor, windsurf, cline
@@ -35,8 +36,10 @@ install_to() {
         local dest="$target/$skill"
 
         mkdir -p "$dest/fixtures"
+        mkdir -p "$dest/scripts"
         cp "$src" "$dest/SKILL.md"
         cp -r "$FIXTURES_SOURCE/." "$dest/fixtures/"
+        cp "$SCRIPTS_SOURCE" "$dest/scripts/"
 
         echo "  [$harness] $skill -> $dest"
     done

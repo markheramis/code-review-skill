@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Installs code-review sub-skills to agent harness skills directories.
-# Each sub-skill gets its own directory with a copy of shared fixtures.
+# Each sub-skill gets its own directory with a copy of shared fixtures and scripts.
 #
 # Usage:
 #   .\install.ps1                        # install to all detected harnesses
@@ -17,7 +17,8 @@ param(
 
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 $FixturesSource = Join-Path $RepoRoot "fixtures"
-$SubSkills = @("commit-review", "branch-review", "pr-review", "repo-review")
+$ScriptsSource = Join-Path $RepoRoot "scripts" "get-reports.py"
+$SubSkills = @("commit-review", "branch-review", "pr-review", "repo-review", "remediate-review")
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified: claude, codex, cursor, windsurf, cline
@@ -37,8 +38,10 @@ function Install-To {
         $dest = Join-Path $TargetPath $skill
 
         New-Item -ItemType Directory -Force -Path (Join-Path $dest "fixtures") | Out-Null
+        New-Item -ItemType Directory -Force -Path (Join-Path $dest "scripts")  | Out-Null
         Copy-Item -Path $src -Destination (Join-Path $dest "SKILL.md") -Force
         Copy-Item -Path "$FixturesSource\*" -Destination (Join-Path $dest "fixtures") -Recurse -Force
+        Copy-Item -Path $ScriptsSource -Destination (Join-Path $dest "scripts") -Force
 
         Write-Host "  [$HarnessName] $skill -> $dest"
     }
