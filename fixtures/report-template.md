@@ -9,7 +9,7 @@
 | Critical | Likely exploitable or production-breaking issue with severe business, security, data integrity, or availability impact. Requires immediate remediation. |
 | High | Significant bug, vulnerability, data loss risk, broken contract, or serious maintainability problem likely to affect production. |
 | Medium | Real issue with limited scope, moderate risk, missing validation, fragile behavior, or likely future defect. |
-| Low | Minor correctness, maintainability, readability, observability, or test coverage issue. |
+| Low | Minor correctness, maintainability, readability, observability, feature, or test coverage issue. |
 | Informational | Observation, improvement opportunity, or context that does not require immediate action. |
 
 ## Confidence Scale
@@ -25,7 +25,7 @@
 {Brief summary of what was reviewed, overall risk level, and the most important conclusions.}
 
 **Overall Risk:** {Critical | High | Medium | Low | Informational}\
-**Review Type:** {Code Review | Security Audit | Architecture Audit | PR Review | Regression Review | Test Coverage Review}\
+**Review Type:** {Code Review | Security Audit | Architecture Audit | PR Review | Regression Review | Test Coverage Review | Improvement Review}\
 **Review Status:** {Complete | Partial | Blocked}
 
 
@@ -80,7 +80,9 @@ The review inspected:
 - Security boundaries
 - Data validation and persistence behavior
 - Test coverage and reproducibility
-- Performance-sensitive paths
+- Optimization and performance-sensitive paths
+- Code complexity, coupling, duplication, and maintainability
+- Feature, product, usability, operational, observability, documentation, and developer-experience improvement opportunities
 - Configuration and deployment assumptions, where applicable
 
 Validation methods used:
@@ -92,6 +94,10 @@ Code intelligence used:
 - {tool_or_capability}
 Audit tools used:
 - {tool_or_check}
+Coverage tools checked:
+- {tool_or_none} ({available | not_found | blocked_with_reason})
+Coverage commands run:
+- {command_or_none}
 Commands run:
 - {command}
 Temporary artifacts:
@@ -121,7 +127,7 @@ Valid Status values: `Open` · `In-Progress` · `Completed` · `Accepted Risk` �
 
 **Severity:** {Critical | High | Medium | Low | Informational}
 **Confidence:** {High | Medium | Low}
-**Category:** {Security | Correctness | Reliability | Performance | Maintainability | Architecture | Testing | Observability | Documentation | Compliance}
+**Category:** {Security | Correctness | Reliability | Performance | Maintainability | Architecture | Testing | Feature | Observability | Documentation | Compliance}
 **Status:** {Open | In-Progress | Completed | Accepted Risk | Needs Verification}
 
 #### Summary
@@ -168,9 +174,17 @@ Observed result:
 
 {Explain the underlying implementation or design cause.}
 
+#### Remediation Analysis
+
+{Explain the researched remediation approach. Include the repository docs, code constraints, external docs/specs/advisories, compatibility concerns, security implications, performance expectations, and alternatives considered when they materially affect the fix.}
+
 #### Recommendation
 
 {Concrete fix recommendation. Prefer precise, minimal changes.}
+
+#### How This Helps
+
+{Explain the concrete benefit: risk reduction, exploit prevention, correctness improvement, performance gain, complexity reduction, better test coverage, feature/user value, operational safety, maintainability, or developer productivity.}
 
 #### Suggested Test Coverage
 
@@ -197,6 +211,14 @@ List confirmed strengths that materially improve confidence.
 - {Positive finding with evidence}
 
 ## Test Coverage Review
+
+### Coverage Tooling
+
+| Tool / Command | Available | Executed | Result / Reason |
+| --- | --- | --- | --- |
+| `{coverage_tool_or_command}` | {Yes/No/Unknown} | {Yes/No} | {coverage_result_or_reason_not_run} |
+
+If no coverage tooling is present, state what was checked (scripts, dependency manifests, coverage config, CI config, or language-specific tools) and explain that coverage could not be measured from available project tooling.
 
 ### Existing Coverage
 
