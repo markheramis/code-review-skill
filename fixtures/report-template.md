@@ -290,10 +290,13 @@ Use this workflow to resolve findings. Work one finding at a time. Do not start 
 4. Implement the fix.
 5. Write or update targeted tests covering the changed behavior. Tests must pass and must achieve high coverage of the changed code paths.
 6. Run the full test suite to verify no existing behavior is broken.
-7. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference this report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
-8. Push the branch.
-9. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name and commit hash.
-10. Repeat from step 1 for the next Open finding.
+7. Update relevant documentation files to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
+8. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference this report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
+9. Push the branch.
+10. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name and commit hash.
+11. Repeat from step 1 for the next Open finding.
+
+> Note: skip 5 and 6 if test infrastructure is not in place in the current project.
 
 ## Final Recommendation
 
