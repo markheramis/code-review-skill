@@ -7,6 +7,7 @@
 #   ./install.sh --harness claude   # install to Claude Code only
 #   ./install.sh --harness codex    # install to Codex only
 #   ./install.sh --harness cursor   # install to Cursor only
+#   ./install.sh --harness vscode   # install to VS Code Copilot only
 #   ./install.sh --harness windsurf # install to Windsurf only
 #   ./install.sh --target /custom/path  # install to custom path
 
@@ -23,6 +24,7 @@ declare -A HARNESS_PATHS=(
     [claude]="$HOME/.claude/skills"           # verified
     [codex]="$HOME/.codex/skills"             # verified
     [cursor]="$HOME/.cursor/skills"           # verified
+    [vscode]="$HOME/.copilot/skills"           # VS Code Copilot documented personal skills path
     [windsurf]="$HOME/.windsurf/skills"       # verified
     [cline]="$HOME/.cline/skills"             # verified
 )

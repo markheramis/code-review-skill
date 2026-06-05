@@ -1,6 +1,6 @@
 # code-review
 
-A set of AI agent skills for structured code review, security auditing, and finding remediation. Installs into Claude Code, Codex, Cursor, Windsurf, and Cline.
+A set of AI agent skills for structured code review, security auditing, and finding remediation. Installs into Claude Code, Codex, Cursor, VS Code Copilot, Windsurf, and Cline.
 
 ## Skills
 
@@ -28,6 +28,7 @@ Each review skill produces a structured report with findings ordered by severity
 ./install/install.sh --harness claude     # Claude Code
 ./install/install.sh --harness codex      # Codex
 ./install/install.sh --harness cursor     # Cursor
+./install/install.sh --harness vscode     # VS Code Copilot
 ./install/install.sh --harness windsurf   # Windsurf
 ./install/install.sh --harness cline      # Cline
 ```
@@ -44,6 +45,7 @@ Each review skill produces a structured report with findings ordered by severity
 .\install\install-claude.ps1
 .\install\install-codex.ps1
 .\install\install-cursor.ps1
+.\install\install-vscode.ps1
 .\install\install-windsurf.ps1
 .\install\install-cline.ps1
 ```
@@ -103,11 +105,13 @@ install/
   install-claude.ps1        per-harness wrappers
   install-codex.ps1
   install-cursor.ps1
+  install-vscode.ps1
   install-windsurf.ps1
   install-cline.ps1
   install-claude.sh
   install-codex.sh
   install-cursor.sh
+  install-vscode.sh
   install-windsurf.sh
   install-cline.sh
 ```

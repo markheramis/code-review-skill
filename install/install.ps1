@@ -7,6 +7,7 @@
 #   .\install.ps1 -Harness claude        # install to Claude Code only
 #   .\install.ps1 -Harness codex         # install to Codex only
 #   .\install.ps1 -Harness cursor        # install to Cursor only
+#   .\install.ps1 -Harness vscode        # install to VS Code Copilot only
 #   .\install.ps1 -Harness windsurf      # install to Windsurf only
 #   .\install.ps1 -Target C:\custom\path # install to custom path
 
@@ -26,6 +27,7 @@ $HarnessPaths = @{
     claude   = "$env:USERPROFILE\.claude\skills"     # verified
     codex    = "$env:USERPROFILE\.codex\skills"      # verified
     cursor   = "$env:USERPROFILE\.cursor\skills"     # verified
+    vscode   = "$env:USERPROFILE\.copilot\skills"    # VS Code Copilot documented personal skills path
     windsurf = "$env:USERPROFILE\.windsurf\skills"   # verified
     cline    = "$env:USERPROFILE\.cline\skills"      # verified
 }
