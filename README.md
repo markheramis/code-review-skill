@@ -1,6 +1,6 @@
 # code-review
 
-A set of AI agent skills for structured code review, security auditing, project improvement discovery, and finding remediation. Installs into Claude Code, Codex, Cursor, VS Code Copilot, Windsurf, and Cline.
+A set of AI agent skills for structured code review, security auditing, project improvement discovery, and finding remediation. Installs into Claude Code, Codex, Cursor, VS Code Copilot, Windsurf, Cline, Continue, Hermes, Junie, Trae, and generic `.agents` skill roots.
 
 ## Skills
 
@@ -16,13 +16,15 @@ Each review skill produces a structured report with findings ordered by severity
 
 ## Install
 
-### Auto-detect (installs to all harnesses found on this machine)
+### Auto-detect (installs to existing harness skill directories)
 
 ```bash
 ./install/install.sh
 ```
 
 ### Specific harness
+
+Specific harness installs only run when that harness's `skills` directory already exists. Use a custom path for an explicit new destination.
 
 ```bash
 ./install/install.sh --harness claude     # Claude Code
@@ -31,6 +33,11 @@ Each review skill produces a structured report with findings ordered by severity
 ./install/install.sh --harness vscode     # VS Code Copilot
 ./install/install.sh --harness windsurf   # Windsurf
 ./install/install.sh --harness cline      # Cline
+./install/install.sh --harness agents     # generic ~/.agents skills root
+./install/install.sh --harness continue   # Continue
+./install/install.sh --harness hermes     # Hermes
+./install/install.sh --harness junie      # Junie
+./install/install.sh --harness trae       # Trae
 ```
 
 ### Custom path
@@ -48,6 +55,11 @@ Each review skill produces a structured report with findings ordered by severity
 .\install\install-vscode.ps1
 .\install\install-windsurf.ps1
 .\install\install-cline.ps1
+.\install\install-agents.ps1
+.\install\install-continue.ps1
+.\install\install-hermes.ps1
+.\install\install-junie.ps1
+.\install\install-trae.ps1
 ```
 
 ## Report format
