@@ -26,18 +26,22 @@ SUB_SKILLS=(commit-review branch-review pr-review repo-review remediate-review)
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified on this workstation: agents, claude, cline, codex, continue, cursor,
 # hermes, junie, trae, vscode/copilot, windsurf
-declare -A HARNESS_PATHS=(
-    [agents]="$HOME/.agents/skills"           # generic Agent Skills root
-    [claude]="$HOME/.claude/skills"           # verified
-    [cline]="$HOME/.cline/skills"             # verified
-    [codex]="$HOME/.codex/skills"             # verified
-    [continue]="$HOME/.continue/skills"       # verified
-    [cursor]="$HOME/.cursor/skills"           # verified
-    [hermes]="$HOME/.hermes/skills"           # verified
-    [junie]="$HOME/.junie/skills"             # verified
-    [trae]="$HOME/.trae/skills"               # verified
-    [vscode]="$HOME/.copilot/skills"           # VS Code Copilot documented personal skills path
-    [windsurf]="$HOME/.windsurf/skills"       # verified
+# NOTE: keep HARNESS_KEYS and HARNESS_DIRS as parallel indexed arrays (not an
+# associative array) so the script works on macOS bash 3.2, which lacks
+# `declare -A`. Order must match between the two arrays.
+HARNESS_KEYS=(agents claude cline codex continue cursor hermes junie trae vscode windsurf)
+HARNESS_DIRS=(
+    "$HOME/.agents/skills"   # generic Agent Skills root
+    "$HOME/.claude/skills"   # verified
+    "$HOME/.cline/skills"    # verified
+    "$HOME/.codex/skills"    # verified
+    "$HOME/.continue/skills" # verified
+    "$HOME/.cursor/skills"   # verified
+    "$HOME/.hermes/skills"   # verified
+    "$HOME/.junie/skills"    # verified
+    "$HOME/.trae/skills"     # verified
+    "$HOME/.copilot/skills"  # VS Code Copilot documented personal skills path
+    "$HOME/.windsurf/skills" # verified
 )
 
 resolve_harness() {
@@ -46,6 +50,19 @@ resolve_harness() {
         copilot) echo "vscode" ;;
         *) echo "$1" ;;
     esac
+}
+
+# Look up the path for a harness name. Echoes nothing if unknown.
+harness_path() {
+    local name="$1"
+    local i
+    for i in "${!HARNESS_KEYS[@]}"; do
+        if [[ "${HARNESS_KEYS[$i]}" == "$name" ]]; then
+            echo "${HARNESS_DIRS[$i]}"
+            return 0
+        fi
+    done
+    return 1
 }
 
 install_to() {
@@ -84,27 +101,33 @@ if [[ -n "$CUSTOM_TARGET" ]]; then
     install_to "$CUSTOM_TARGET" "custom"
 elif [[ -n "$HARNESS" ]]; then
     HARNESS="$(resolve_harness "$HARNESS")"
-    path="${HARNESS_PATHS[$HARNESS]:-}"
-    if [[ -z "$path" ]]; then
+    if ! path="$(harness_path "$HARNESS")"; then
         echo "Unknown harness: $HARNESS"
-        echo "Known: ${!HARNESS_PATHS[*]}"
+        echo "Known: ${HARNESS_KEYS[*]}"
         exit 1
     fi
     if [[ ! -d "$path" ]]; then
-        echo "Skills directory does not exist for harness '$HARNESS': $path"
-        exit 1
+        echo "Creating $HARNESS skills directory: $path"
+        mkdir -p "$path"
     fi
     echo "Installing to $HARNESS ($path)"
     install_to "$path" "$HARNESS"
 else
-    # install to all harnesses whose skills directory already exists
+    # Auto-detect: install to every known harness, creating the skills
+    # directory if it does not already exist. This way a single
+    # `./install/install.sh` works on a fresh machine.
     installed=0
-    for harness in "${!HARNESS_PATHS[@]}"; do
-        if [[ -d "${HARNESS_PATHS[$harness]}" ]]; then
+    for i in "${!HARNESS_KEYS[@]}"; do
+        harness="${HARNESS_KEYS[$i]}"
+        path="${HARNESS_DIRS[$i]}"
+        if [[ -d "$path" ]]; then
             echo "Installing to $harness..."
-            install_to "${HARNESS_PATHS[$harness]}" "$harness"
-            ((installed += 1))
+        else
+            echo "Creating $harness skills directory and installing..."
+            mkdir -p "$path"
         fi
+        install_to "$path" "$harness"
+        installed=$((installed + 1))
     done
     if [[ $installed -eq 0 ]]; then
         echo "No known harness skills directories found. Use --target for an explicit custom path."
@@ -112,4 +135,4 @@ else
     fi
 fi
 
-echo "Done. ${#SUB_SKILLS[@]} skills installed."
+echo "Done. ${#SUB_SKILLS[@]} skills installed to ${installed} harness(es)."
