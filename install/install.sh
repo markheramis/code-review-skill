@@ -20,7 +20,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FIXTURES_SOURCE="$REPO_ROOT/fixtures"
-SCRIPTS_SOURCE="$REPO_ROOT/scripts/get-reports.py"
+SCRIPTS_SOURCE="$REPO_ROOT/scripts"
 SUB_SKILLS=(commit-review branch-review pr-review repo-review remediate-review verify-report)
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ install_to() {
         mkdir -p "$dest/scripts"
         cp "$src" "$dest/SKILL.md"
         cp -r "$FIXTURES_SOURCE/." "$dest/fixtures/"
-        cp "$SCRIPTS_SOURCE" "$dest/scripts/"
+        cp "$SCRIPTS_SOURCE"/*.py "$dest/scripts/"
 
         echo "  [$harness] $skill -> $dest"
     done

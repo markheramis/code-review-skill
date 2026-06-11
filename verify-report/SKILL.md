@@ -27,7 +27,7 @@ Work one finding at a time. Do not start the next finding until the current one 
 
 1. Run `python scripts/get-findings-by-status.py <report_dir> needs-verification` to list all Needs Verification findings across reports. Filter to the selected report if more than one.
 2. Pick the highest-priority finding. Priority order: Critical → High → Medium → Low → Informational.
-3. Read the full finding block. Use the `path` and `line` fields from the script output to open the report at the exact heading. Read from that line through the end of the finding block (next `### F-XXX:` or `---` separator). Capture: Summary, Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, and any Remediation Notes.
+3. Read the full finding block surgically: use `python scripts/get-heading-content.py <report> --title "<finding_id>" --type h3` to extract the finding block directly. Capture: Summary, Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, and any Remediation Notes.
 4. **Autonomy Assessment** — Before any research, evaluate whether the agent has the access and visibility needed to verify this finding:
    - Can the agent read every file referenced in the Evidence section?
    - Are the referenced symbols, code paths, and dependencies available in the workspace?
@@ -108,6 +108,8 @@ The agent CAN autonomously verify findings that only require:
 
 ## Resources
 
+- `scripts/get-report-headings.py`: returns all Markdown heading line ranges for surgical inspection.
+- `scripts/get-heading-content.py`: extracts the content of a specific heading by title.
 - `scripts/get-reports.py`: lists reports and their finding counts as JSON.
 - `scripts/get-findings-by-status.py`: extracts individual findings filtered by status, with file path and line number for surgical inspection.
 - `fixtures/report-template.md`: report schema (understanding finding structure, metadata fields, and status values).

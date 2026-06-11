@@ -40,7 +40,7 @@ Before starting:
 2. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
    - Path provided: save to memory as `code-review.report_dir`, write report as `branch-<name>-review-YYYY-MM-DD-HHmm.md`.
    - No path: output directly. Ask again next time.
-3. If report directory is known, glob for `branch-<name>-review-*.md` in that directory. For each match (sorted oldest-first), surgically read: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
+3. If report directory is known, glob for `branch-<name>-review-*.md` in that directory. For each match (sorted oldest-first), run `python scripts/get-report-headings.py <report>` to map heading line ranges, then use `python scripts/get-heading-content.py <report> --title <heading>` to surgically read only: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
    - Understand which files and modules were already covered.
    - Avoid repeating confirmed findings; focus inspection on areas listed in Excluded or Limitations.
    - Prioritize any previously Low-confidence findings that warrant re-examination.
@@ -108,5 +108,9 @@ These rules govern report production. Do not include them in the report output.
 
 ## Resources
 
+- `scripts/get-report-headings.py`: returns all Markdown heading line ranges for surgical inspection.
+- `scripts/get-heading-content.py`: extracts the content of a specific heading by title.
+- `scripts/get-reports.py`: lists reports and their finding status counts as JSON.
+- `scripts/get-findings-by-status.py`: extracts individual findings filtered by status, with file path and line number.
 - `fixtures/report-template.md`: audit report template with severity/confidence scales.
 - `fixtures/lang-checklist.md`: language- and runtime-specific audit commands.

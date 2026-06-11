@@ -74,6 +74,25 @@ Reports follow the template in [fixtures/report-template.md](fixtures/report-tem
 - **Architecture / Maintainability Review** — coupling, error handling, performance considerations
 - **Final Recommendation** — Approve / Approve with follow-ups / Request changes / Block release
 
+## Scripts
+
+Surgical report inspection scripts for reading only the parts of a report that are needed, without loading the entire file into context.
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/get-report-headings.py` | Return all Markdown headings with `start_line`/`end_line` ranges — map the report before reading anything. |
+| `scripts/get-heading-content.py` | Extract the content of a specific heading by title and optional type (`--type h2`, `--type h3`). |
+| `scripts/get-reports.py` | List reports in a directory with finding status counts (Open, In-Progress, Completed, etc.). |
+| `scripts/get-findings-by-status.py` | Extract individual findings filtered by status, with file path and line number for surgical inspection. |
+
+### Surgical reading workflow
+
+Instead of reading an entire report, the skills use this pattern:
+
+1. `python scripts/get-report-headings.py <report>` — see the structure and line ranges
+2. `python scripts/get-heading-content.py <report> --title "<heading>"` — read only the needed section
+3. For a finding block: `--title "F-001" --type h3` — read exactly that finding
+
 ## Remediation
 
 Use `remediate-review` to fix Open findings from a report:

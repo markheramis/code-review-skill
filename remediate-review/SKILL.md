@@ -24,22 +24,23 @@ Fix Open findings in a code review report. Takes one finding at a time: analyze,
 
 Work one finding at a time. Do not start the next finding until the current one is validated, committed, pushed, and the user has answered whether to create a pull request.
 
-1. Pick the highest-priority Open finding from the report's `## Findings Summary` table. Priority order: Critical → High → Medium → Low → Informational.
-2. Update its Status to `In-Progress` in both `## Findings Summary` and the finding block. Write the modified report back to disk.
-3. Analyze: read the finding's Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, How This Helps, and Suggested Test Coverage. Confirm the issue still exists in the current codebase before fixing. For runtime-behavior findings, prefer the smallest safe executable check: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the reported edge case. If an older report lacks Remediation Analysis or How This Helps, derive them from the evidence and research before changing code.
-4. Research supporting context for this finding: search repository documentation first; if a RAG or context-retrieval system is available, query it for relevant project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior needed to remediate accurately.
-5. Plan the fix: identify the minimal change needed and the expected project benefit. Prefer targeted edits over rewrites. Use the research context to validate the intended behavior, API contracts, compatibility constraints, performance expectations, test strategy, and security implications.
-6. Implement the fix.
-7. Write or update targeted tests covering the changed behavior. Promote any useful temporary repro into a real regression test when it is stable, maintainable, and within scope. Tests must pass and achieve high coverage of the changed code paths.
-8. Run the full test suite to verify no existing behavior is broken.
-9. Update relevant documentation to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
-10. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference the report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
-11. Push the branch.
-12. Ask the user whether to create a pull request for this remediation before moving to the next finding. If the user says yes, create the PR and record its URL. If the user says no, continue without creating one and record that choice.
-13. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name, commit hash, PR URL or no-PR decision, validation performed, research sources used, and the concrete benefit delivered or still needing measurement. Write the modified report back to disk.
-14. Repeat from step 1 for the next Open finding.
+1. Run `python scripts/get-report-headings.py <report>` to map the report's heading line ranges, then use `python scripts/get-heading-content.py <report> --title <title> --type h3` to surgically read each finding block on demand.
+2. Pick the highest-priority Open finding from the report's `## Findings Summary` table. Priority order: Critical → High → Medium → Low → Informational.
+3. Update its Status to `In-Progress` in both `## Findings Summary` and the finding block. Write the modified report back to disk.
+4. Analyze: read the finding's Evidence, Impact, Root Cause, Remediation Analysis, Recommendation, How This Helps, and Suggested Test Coverage. Confirm the issue still exists in the current codebase before fixing. For runtime-behavior findings, prefer the smallest safe executable check: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the reported edge case. If an older report lacks Remediation Analysis or How This Helps, derive them from the evidence and research before changing code.
+5. Research supporting context for this finding: search repository documentation first; if a RAG or context-retrieval system is available, query it for relevant project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior needed to remediate accurately.
+6. Plan the fix: identify the minimal change needed and the expected project benefit. Prefer targeted edits over rewrites. Use the research context to validate the intended behavior, API contracts, compatibility constraints, performance expectations, test strategy, and security implications.
+7. Implement the fix.
+8. Write or update targeted tests covering the changed behavior. Promote any useful temporary repro into a real regression test when it is stable, maintainable, and within scope. Tests must pass and achieve high coverage of the changed code paths.
+9. Run the full test suite to verify no existing behavior is broken.
+10. Update relevant documentation to reflect the change (inline docs, README, changelogs, API docs, architecture notes — whatever applies to the scope of the fix).
+11. Commit the fix to an appropriately named branch: `{hotfix|bugfix|refactor|docs|chore}/{descriptive-branch-name}`. Write the commit message to describe what changed and why — do not reference the report file, report IDs, or internal review artifacts. The commit message must stand on its own for anyone reading the repository history.
+12. Push the branch.
+13. Ask the user whether to create a pull request for this remediation before moving to the next finding. If the user says yes, create the PR and record its URL. If the user says no, continue without creating one and record that choice.
+14. Update the finding's Status to `Completed` in both `## Findings Summary` and the finding block. Add a brief note under `#### Remediation Notes` with the branch name, commit hash, PR URL or no-PR decision, validation performed, research sources used, and the concrete benefit delivered or still needing measurement. Write the modified report back to disk.
+15. Repeat from step 1 for the next Open finding.
 
-**When tests are unavailable:** If the project has no test infrastructure, skip steps 7–8. Document the omission in `#### Remediation Notes`.
+**When tests are unavailable:** If the project has no test infrastructure, skip steps 8–9. Document the omission in `#### Remediation Notes`.
 
 ## Finding Rules
 
@@ -59,6 +60,9 @@ Work one finding at a time. Do not start the next finding until the current one 
 
 ## Resources
 
+- `scripts/get-report-headings.py`: returns all Markdown heading line ranges for surgical inspection.
+- `scripts/get-heading-content.py`: extracts the content of a specific heading by title.
 - `scripts/get-reports.py`: lists reports and their finding counts as JSON.
+- `scripts/get-findings-by-status.py`: extracts individual findings filtered by status, with file path and line number.
 - `fixtures/report-template.md`: report schema (understanding finding structure and status values).
 - `fixtures/lang-checklist.md`: language- and runtime-specific audit commands (useful for running tests during remediation).

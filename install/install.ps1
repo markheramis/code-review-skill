@@ -23,7 +23,7 @@ param(
 
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 $FixturesSource = Join-Path $RepoRoot "fixtures"
-$ScriptsSource = Join-Path $RepoRoot "scripts" "get-reports.py"
+$ScriptsSource = Join-Path $RepoRoot "scripts"
 $SubSkills = @("commit-review", "branch-review", "pr-review", "repo-review", "remediate-review", "verify-report")
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ function Install-To {
         New-Item -ItemType Directory -Force -Path (Join-Path $dest "scripts")  | Out-Null
         Copy-Item -Path $src -Destination (Join-Path $dest "SKILL.md") -Force
         Copy-Item -Path "$FixturesSource\*" -Destination (Join-Path $dest "fixtures") -Recurse -Force
-        Copy-Item -Path $ScriptsSource -Destination (Join-Path $dest "scripts") -Force
+        Copy-Item -Path "$ScriptsSource\*" -Destination (Join-Path $dest "scripts") -Recurse -Force
 
         Write-Host "  [$HarnessName] $skill -> $dest"
     }
