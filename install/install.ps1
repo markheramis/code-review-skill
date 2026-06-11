@@ -24,7 +24,7 @@ param(
 $RepoRoot = Split-Path $PSScriptRoot -Parent
 $FixturesSource = Join-Path $RepoRoot "fixtures"
 $ScriptsSource = Join-Path $RepoRoot "scripts" "get-reports.py"
-$SubSkills = @("commit-review", "branch-review", "pr-review", "repo-review", "remediate-review")
+$SubSkills = @("commit-review", "branch-review", "pr-review", "repo-review", "remediate-review", "verify-report")
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified on this workstation: agents, claude, cline, codex, continue, cursor,

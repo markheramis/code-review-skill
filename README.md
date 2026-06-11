@@ -11,6 +11,7 @@ A set of AI agent skills for structured code review, security auditing, project 
 | `pr-review` | `/pr-review` | Reviewing a pull request with CI and metadata |
 | `repo-review` | `/repo-review` | Auditing an entire repository |
 | `remediate-review` | `/remediate-review` | Fixing Open findings from a review report |
+| `verify-report` | `/verify-report` | Verifying findings marked Needs Verification in a review report |
 
 Each review skill produces a structured report with findings ordered by severity, confidence ratings, evidence, researched remediation analysis, how each fix helps, and a final recommendation (Approve / Approve with follow-ups / Request changes / Block release). Reviews look for security issues, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and other material improvements. The `remediate-review` skill reads an existing report and works through Open findings one at a time.
 

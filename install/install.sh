@@ -21,7 +21,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 FIXTURES_SOURCE="$REPO_ROOT/fixtures"
 SCRIPTS_SOURCE="$REPO_ROOT/scripts/get-reports.py"
-SUB_SKILLS=(commit-review branch-review pr-review repo-review remediate-review)
+SUB_SKILLS=(commit-review branch-review pr-review repo-review remediate-review verify-report)
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified on this workstation: agents, claude, cline, codex, continue, cursor,
