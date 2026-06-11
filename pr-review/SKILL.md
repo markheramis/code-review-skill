@@ -44,6 +44,7 @@ Before starting:
    - Skip re-raising findings already confirmed and acknowledged.
    - Focus on what has changed since the last review (new commits, resolved vs. open findings).
    - Flag findings that remain Open across multiple reviews as recurring risks.
+4. **Determine next finding ID:** If the report directory is known and reports will be saved, run `python scripts/get-next-finding-id.py <report_dir>` to get the starting ID for findings in this report. If no directory is set (output-only), start at `F-001`. Record the starting ID.
 
 ## Workflow
 
@@ -94,6 +95,7 @@ These rules govern report production. Do not include them in the report output.
 ## Finding Rules
 
 - Lead with findings ordered by severity.
+- Assign globally unique `F-XXX` IDs. Use the starting ID returned by `python scripts/get-next-finding-id.py <report_dir>`, incrementing sequentially within the report.
 - Assign severity: `Critical`, `High`, `Medium`, `Low`, or `Informational`.
 - Assign confidence: `High` for direct code/test/log/repro evidence; `Medium` for strong but incomplete evidence; `Low` for plausible concerns needing more data.
 - Assign category: `Security`, `Correctness`, `Reliability`, `Performance`, `Maintainability`, `Architecture`, `Testing`, `Feature`, `Observability`, `Documentation`, or `Compliance`.
@@ -110,6 +112,7 @@ These rules govern report production. Do not include them in the report output.
 
 ## Resources
 
+- `scripts/get-next-finding-id.py`: returns the next available `F-XXX` finding ID for a report directory.
 - `scripts/get-report-headings.py`: returns all Markdown heading line ranges for surgical inspection.
 - `scripts/get-heading-content.py`: extracts the content of a specific heading by title.
 - `scripts/get-reports.py`: lists reports and their finding status counts as JSON.

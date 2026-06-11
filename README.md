@@ -80,6 +80,7 @@ Surgical report inspection scripts for reading only the parts of a report that a
 
 | Script | Purpose |
 |--------|---------|
+| `scripts/get-next-finding-id.py` | Return the next available `F-XXX` finding ID for a report directory, ensuring global uniqueness across all reports. |
 | `scripts/get-report-headings.py` | Return all Markdown headings with `start_line`/`end_line` ranges — map the report before reading anything. |
 | `scripts/get-heading-content.py` | Extract the content of a specific heading by title and optional type (`--type h2`, `--type h3`). |
 | `scripts/get-reports.py` | List reports in a directory with finding status counts (Open, In-Progress, Completed, etc.). |

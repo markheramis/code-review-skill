@@ -114,6 +114,8 @@ External documentation checked:
 
 ## Findings Summary
 
+> **Finding IDs must be globally unique within the project's report directory.** Run `python scripts/get-next-finding-id.py <report_dir>` before drafting findings and use the returned starting ID. Increment sequentially within the report.
+
 | ID | Severity | Confidence | Category | Title | Status |
 | --- | --- | --- | --- | --- | --- |
 | F-001 | High | High | Security | {Finding title} | Open |

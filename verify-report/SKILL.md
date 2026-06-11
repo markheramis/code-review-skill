@@ -105,6 +105,7 @@ The agent CAN autonomously verify findings that only require:
 - Do not claim a reproduction was successful unless the command was actually run in this session.
 - When escalating to the user, be specific: what exactly to check, where, and what to look for.
 - The report file is the source of truth — always write status updates back to it immediately.
+- Finding IDs are globally unique within the project's report directory. Cross-report references in Remediation Notes are unambiguous. Use the `id` field from `scripts/get-findings-by-status.py` output when referencing a finding from another report.
 
 ## Resources
 

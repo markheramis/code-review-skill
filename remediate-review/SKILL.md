@@ -57,6 +57,7 @@ Work one finding at a time. Do not start the next finding until the current one 
 - Record exact commands, tools, repository documentation, RAG/context systems, external documentation, and cleanup status for each fix.
 - Do not claim tests passed unless they were run in this remediation session.
 - The report file is the source of truth — always write status updates back to it immediately.
+- Finding IDs are globally unique within the project's report directory. When cross-referencing findings from another report in Remediation Notes, use the globally unique `F-XXX` ID — it resolves unambiguously.
 
 ## Resources
 
