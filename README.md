@@ -1,23 +1,93 @@
-# code-review
+# Evidence-First Code Review
 
-A set of AI agent skills for structured code review, security auditing, project improvement discovery, and finding remediation. Installs into Claude Code, Codex, Cursor, VS Code Copilot, Windsurf, Cline, Continue, Hermes, Junie, Trae, and generic `.agents` skill roots.
+A single skill, `evidence-first-code-review`, that orchestrates an end-to-end code review: catalog the environment, baseline prior findings, scan risk domains, verify hypotheses, write a single-finding report, deep-confirm contested findings, create issues, and remediate Open findings — one bounded task at a time.
 
-## Skills
+## What this is
 
-| Skill | Trigger | Use when |
-|-------|---------|----------|
-| `commit-review` | `/commit-review` | Reviewing a single commit or patch |
-| `branch-review` | `/branch-review` | Reviewing a feature branch before merge |
-| `pr-review` | `/pr-review` | Reviewing a pull request with CI and metadata |
-| `repo-review` | `/repo-review` | Auditing an entire repository |
-| `remediate-review` | `/remediate-review` | Fixing Open findings from a review report |
-| `verify-report` | `/verify-report` | Verifying findings marked Needs Verification in a review report |
+A methodology-first replacement for the original flat `kilo-code-review` skill. The methodology is unchanged: every suspected issue is a hypothesis until current-code evidence, primary-source documentation, tool output, or a focused experiment confirms it. The structure changed: instead of six top-level skills that each carry their own copy of the same fixtures, this package ships **one** skill with the deep-dive details in a `references/` directory that the SKILL.md points at on demand.
 
-Each review skill produces a structured report with findings ordered by severity, confidence ratings, evidence, researched remediation analysis, how each fix helps, and a final recommendation (Approve / Approve with follow-ups / Request changes / Block release). Reviews look for security issues, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and other material improvements. The `remediate-review` skill reads an existing report and works through Open findings one at a time.
+## Why one skill instead of six
+
+Hermes, Claude Code, Codex, Cursor, VS Code Copilot, Windsurf, Cline, Junie, Trae, Continue, and the generic Agents spec all load a skill by reading exactly one `SKILL.md`. A nested layout that keeps separate top-level skill folders (`repo-review/`, `pr-review/`, ...) is functionally just "more flat skills" — the harness still treats each folder as its own skill.
+
+Putting the deep-dive docs in `references/` keeps navigation in a single place, makes the structure tree-readable in one glance, and lets the always-visible `SKILL.md` stay small enough to fit comfortably in any harness's context budget.
+
+## Layout
+
+```
+evidence-first-code-review/
+├── SKILL.md                    # Entry point — the only file harnesses load
+├── README.md                   # This file
+├── LICENSE                     # MIT
+├── references/                 # 32 deep-dive docs, loaded on demand
+│   ├── repo-review.md          # full repository audit
+│   ├── pr-review.md            # pull request review
+│   ├── commit-review.md        # single commit / patch review
+│   ├── branch-review.md        # feature branch diff vs base
+│   ├── remediate-review.md     # Open-finding burn-down orchestrator
+│   ├── verify-report.md        # validate a completed report
+│   ├── inventory.md            # provenance + toolchain + MCP tools
+│   ├── baseline-map.md         # focus list + Prior Findings Index
+│   ├── risk-scan.md            # one bounded domain per call
+│   ├── finding-verification.md # per-hypothesis evidence + disproof
+│   ├── experiment-summary.md   # runtime / correctness / security / perf
+│   ├── staleness-check.md      # detect outdated findings
+│   ├── warning-analysis.md     # classify compiler warnings
+│   ├── deep-confirm.md         # deep confirmation orchestrator
+│   ├── deep-confirm-classify.md
+│   ├── deep-confirm-experiment.md
+│   ├── deep-confirm-record.md
+│   ├── report-queue.md         # deterministic Open queue
+│   ├── report-triage.md        # categorize findings
+│   ├── report-resolution.md    # sequential burn-down
+│   ├── report-note-draft.md    # reviewer notes and comments
+│   ├── report-finalize.md      # template compliance + status sync
+│   ├── validation-summary.md   # summarize validation results
+│   ├── create-issues.md        # tracker issues for unresolved findings
+│   ├── remediate-finding.md    # remediate orchestrator
+│   ├── remediate-verify.md
+│   ├── remediate-experiment.md
+│   ├── remediate-implement.md
+│   ├── remediate-validate.md
+│   ├── remediate-warn.md
+│   ├── remediate-cleanup.md
+│   └── remediate-packet.md
+├── fixtures/                   # Templates and JSON schemas
+│   ├── report-template.md      # single-finding template
+│   ├── lang-checklist.md       # per-language audit commands
+│   ├── scale-severity.json     # severity scale definition
+│   ├── scale-confidence.json   # confidence scale definition
+│   ├── status-findings.json    # finding status lifecycle
+│   ├── status-issues.json      # issue status lifecycle
+│   ├── status-deep-confirmation.json
+│   └── workflow-manifest.json  # orchestrator stage metadata
+├── scripts/                    # Python utilities (surgical readers)
+│   ├── get-next-finding-id.py
+│   ├── get-report-headings.py
+│   ├── get-heading-content.py
+│   ├── get-reports.py
+│   └── get-findings-by-status.py
+└── install/                    # multi-harness installer
+    ├── install.sh / install.ps1        # main installer
+    └── install-<harness>.{sh,ps1} × 11 harnesses
+```
+
+## Pipeline
+
+```
+inventory → baseline-map → risk-scan (parallel) → finding-verification →
+experiment-summary → report writing
+                                                  │
+              ┌───────────────────────────────────┼──────────────────────┐
+              ▼                                   ▼                      ▼
+        deep-confirm                       create-issues          remediate
+              │                                   │                      │
+              └────────────► status update ◄──────┴────────── status update
+```
 
 ## Install
 
-### Auto-detect (installs to existing harness skill directories)
+### Auto-detect (every harness whose skills directory exists)
 
 ```bash
 ./install/install.sh
@@ -25,20 +95,18 @@ Each review skill produces a structured report with findings ordered by severity
 
 ### Specific harness
 
-Specific harness installs only run when that harness's `skills` directory already exists. Use a custom path for an explicit new destination.
-
 ```bash
+./install/install.sh --harness hermes     # Hermes Agent
 ./install/install.sh --harness claude     # Claude Code
 ./install/install.sh --harness codex      # Codex
 ./install/install.sh --harness cursor     # Cursor
 ./install/install.sh --harness vscode     # VS Code Copilot
 ./install/install.sh --harness windsurf   # Windsurf
 ./install/install.sh --harness cline      # Cline
-./install/install.sh --harness agents     # generic ~/.agents skills root
-./install/install.sh --harness continue   # Continue
-./install/install.sh --harness hermes     # Hermes
 ./install/install.sh --harness junie      # Junie
 ./install/install.sh --harness trae       # Trae
+./install/install.sh --harness continue   # Continue
+./install/install.sh --harness agents     # generic ~/.agents skills
 ```
 
 ### Custom path
@@ -50,70 +118,113 @@ Specific harness installs only run when that harness's `skills` directory alread
 ### Windows (PowerShell)
 
 ```powershell
-.\install\install-claude.ps1
-.\install\install-codex.ps1
-.\install\install-cursor.ps1
-.\install\install-vscode.ps1
-.\install\install-windsurf.ps1
-.\install\install-cline.ps1
-.\install\install-agents.ps1
-.\install\install-continue.ps1
-.\install\install-hermes.ps1
-.\install\install-junie.ps1
-.\install\install-trae.ps1
+.\install\install.ps1                                          # auto-detect
+.\install\install-hermes.ps1                                   # Hermes
+.\install\install-claude.ps1                                   # Claude
+.\install\install-codex.ps1                                    # Codex
+.\install\install.ps1 -Harness cursor                          # Cursor
+.\install\install.ps1 -Target C:\path\to\skills                # custom
 ```
 
-## Report format
+Per-harness `.sh` and `.ps1` wrappers exist for every harness.
 
-Reports follow the template in [fixtures/report-template.md](fixtures/report-template.md) and the report output rules embedded in each review skill:
+## What gets installed
 
-- **Executive Summary** — overall risk level and key conclusions
-- **Findings** — each with severity, confidence, evidence, impact, root cause, remediation analysis, recommendation, how it helps, and suggested tests
-- **Security Review** — trust boundaries, sensitive assets, auth/authz/input/output/secrets/logging/deps
-- **Test Coverage Review** — coverage tooling checked, coverage result or absence explanation, existing gaps, and recommended tests
-- **Architecture / Maintainability Review** — coupling, error handling, performance considerations
-- **Final Recommendation** — Approve / Approve with follow-ups / Request changes / Block release
+The installer copies one directory:
 
-## Scripts
+```
+<skills-root>/evidence-first-code-review/
+├── SKILL.md
+├── references/  (32 docs)
+├── fixtures/    (8 files)
+└── scripts/     (5 Python utilities)
+```
 
-Surgical report inspection scripts for reading only the parts of a report that are needed, without loading the entire file into context.
+After install, load the skill in your harness:
 
-| Script | Purpose |
-|--------|---------|
-| `scripts/get-next-finding-id.py` | Return the next available `F-XXX` finding ID for a report directory, ensuring global uniqueness across all reports. |
-| `scripts/get-report-headings.py` | Return all Markdown headings with `start_line`/`end_line` ranges — map the report before reading anything. |
-| `scripts/get-heading-content.py` | Extract the content of a specific heading by title and optional type (`--type h2`, `--type h3`). |
-| `scripts/get-reports.py` | List reports in a directory with finding status counts (Open, In-Progress, Completed, etc.). |
-| `scripts/get-findings-by-status.py` | Extract individual findings filtered by status, with file path and line number for surgical inspection. |
+- Hermes: `/skill evidence-first-code-review`
+- Claude Code / Cursor / Codex / Windsurf / Copilot / Cline / Junie / Trae / Continue / Agents: invoke the skill by name; consult your harness's docs for the exact syntax.
 
-### Surgical reading workflow
+## Quick start
 
-Instead of reading an entire report, the skills use this pattern:
+```text
+"Audit this repository for security and architecture issues, write findings to .ai/reports/"
+"Review PR #123 before merge"
+"Review commit abc123 for regressions"
+"Review branch feature-x against main"
+"Deep-confirm F-007 in the active report"
+"Fix all Open findings in the latest review report"
+```
 
-1. `python scripts/get-report-headings.py <report>` — see the structure and line ranges
-2. `python scripts/get-heading-content.py <report> --title "<heading>"` — read only the needed section
-3. For a finding block: `--title "F-001" --type h3` — read exactly that finding
+The skill will:
 
-## Remediation
+1. Check memory for a project-specific report directory, or ask you where to save.
+2. Load the entry-point reference for the chosen review type (`repo-review`, `pr-review`, `commit-review`, `branch-review`, `remediate-review`, or `verify-report`).
+3. Run the pipeline stages described in the SKILL.md and the loaded reference.
 
-Use `remediate-review` to fix Open findings from a report:
+## Configuration
 
-1. Run `python scripts/get-reports.py <report_dir>` to list reports with finding counts
-2. Invoke `/remediate-review` — it picks the report with Open findings and works through them one at a time
-3. Each fix is committed to a descriptive branch, pushed, and then asks whether to create a pull request before moving to the next finding
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `KILO_REPORT_DIRECTORY` | `.ai/reports/` | Where findings are saved |
+| `KILO_CONFIG_ROOT` | `~/.config/kilo` | Original Kilo config root (kept for compatibility) |
+| `KILO_REPORT_TEMPLATE` | `<KILO_CONFIG_ROOT>/fixtures/report-template.md` | Single-finding template |
+| `KILO_TOOLS_PATH` | `<KILO_CONFIG_ROOT>/tools/` | Node-based Kilo tooling |
+| `KILO_FINDINGS_STATUS` | `<KILO_CONFIG_ROOT>/fixtures/status-findings.json` | Status lifecycle |
+| `KILO_DEEP_CONFIRMATION_STATUS` | `<KILO_CONFIG_ROOT>/fixtures/status-deep-confirmation.json` | Deep-confirm state |
 
-### Severity scale
+When the `KILO_*` variables point at an installed Kilo config, the skill uses them. When they are absent, the skill falls back to the bundled `fixtures/` and `scripts/` directories.
 
-| Level | Meaning |
-|-------|---------|
-| Critical | Likely exploitable or production-breaking; requires immediate remediation |
-| High | Significant bug or vulnerability likely to affect production |
-| Medium | Real issue with limited scope or moderate risk |
-| Low | Minor correctness, maintainability, feature, or test coverage issue |
-| Informational | Observation or improvement opportunity that does not require immediate action |
+## Evidence-first principles
 
-## Supported languages
+1. **No proof, no finding.** Every confirmed finding needs evidence: a recorded experiment, a passing/failing test run, a primary-source citation, or a tool/compiler diagnostic. "Looks suspicious" → `Low`/`Needs Verification`; disproven hypotheses are excluded.
+2. **Surgical reading.** Never load an entire report. Use the scripts in `scripts/` to read only the frontmatter or the specific heading you need.
+3. **Single finding per file.** Every finding is its own `F-NNN-<slug>.md`; frontmatter is the single source of truth for metadata. Tags belong to reports, never to commit messages or change-request titles.
+4. **Never invent.** No fabricated code behavior, tool output, dependency versions, or test results. No secrets, credentials, private source, or PII to external tools.
+5. **Dedup against the Prior Findings Index.** Extend an existing Open/In-Progress/Needs-Verification finding rather than duplicate; re-raise Completed/Closed only with regression evidence.
 
-[fixtures/lang-checklist.md](fixtures/lang-checklist.md) lists the audit commands run during review for each language:
+## Migration from the old flat `kilo-code-review`
 
-Rust · JavaScript/TypeScript · Python · Go · Java · C#/.NET · C/C++ · Ruby · PHP
+If you have the previous flat skill installed:
+
+1. Re-run `./install/install.sh` — the new installer overwrites the old `evidence-first-code-review/` directory on top of any `kilo-code-review/` it finds (different name, no collision).
+2. Manually remove the old `kilo-code-review/`, `repo-review/`, `pr-review/`, `commit-review/`, `branch-review/`, `remediate-review/`, and `verify-report/` directories from each harness's skills root:
+   ```bash
+   rm -rf ~/.hermes/skills/kilo-code-review \
+          ~/.hermes/skills/repo-review \
+          ~/.hermes/skills/pr-review \
+          ~/.hermes/skills/commit-review \
+          ~/.hermes/skills/branch-review \
+          ~/.hermes/skills/remediate-review \
+          ~/.hermes/skills/verify-report
+   ```
+3. Existing reports under `.ai/reports/` are unchanged and remain valid.
+
+## Relationship to other skills
+
+- **`requesting-code-review`** — fast pre-commit gate; this skill is the deeper review that follows when the gate flags something.
+- **`plan`** — this skill validates that the implementation matches the plan.
+- **`test-driven-development`** — verification stage checks that TDD discipline produced tests.
+- **`systematic-debugging`** — hand off when a finding becomes a live investigation.
+- **`github-code-review`** — hand off when findings become inline PR comments.
+- **`document-writer`** — sibling package; uses the same install pattern and the same evidence-first verification discipline.
+
+## Supported harnesses
+
+| Harness | Skills path |
+|---------|-------------|
+| Hermes Agent | `~/.hermes/skills/` |
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| Cursor | `~/.cursor/skills/` |
+| VS Code Copilot | `~/.copilot/skills/` |
+| Windsurf | `~/.windsurf/skills/` |
+| Cline | `~/.cline/skills/` |
+| Junie | `~/.junie/skills/` |
+| Trae | `~/.trae/skills/` |
+| Continue | `~/.continue/skills/` |
+| Generic Agents | `~/.agents/skills/` |
+
+## License
+
+MIT — see `LICENSE`.

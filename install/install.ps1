@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
-# Installs code-review sub-skills to agent harness skills directories.
-# Each sub-skill gets its own directory with a copy of shared fixtures and scripts.
+# Installs the evidence-first-code-review skill to agent harness skills directories.
+# The skill installs as a single SKILL.md with references/, fixtures/, and scripts/.
 #
 # Usage:
 #   .\install.ps1                        # install to all detected harnesses
@@ -12,9 +12,9 @@
 #   .\install.ps1 -Harness hermes        # install to Hermes only
 #   .\install.ps1 -Harness junie         # install to Junie only
 #   .\install.ps1 -Harness trae          # install to Trae only
-#   .\install.ps1 -Harness vscode        # install to VS Code Copilot only
+#   .\install.ps1 -Harness vscode         # install to VS Code Copilot only
 #   .\install.ps1 -Harness windsurf      # install to Windsurf only
-#   .\install.ps1 -Target C:\custom\path # install to custom path
+#   .\install.ps1 -Target C:\custom\path  # install to a custom skills root
 
 param(
     [string]$Harness = "",
@@ -22,9 +22,11 @@ param(
 )
 
 $RepoRoot = Split-Path $PSScriptRoot -Parent
+$SkillName = "evidence-first-code-review"
+$SkillSource = Join-Path $RepoRoot "SKILL.md"
+$ReferencesSource = Join-Path $RepoRoot "references"
 $FixturesSource = Join-Path $RepoRoot "fixtures"
 $ScriptsSource = Join-Path $RepoRoot "scripts"
-$SubSkills = @("commit-review", "branch-review", "pr-review", "repo-review", "remediate-review", "verify-report")
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified on this workstation: agents, claude, cline, codex, continue, cursor,
@@ -51,18 +53,40 @@ $HarnessAliases = @{
 function Install-To {
     param([string]$TargetPath, [string]$HarnessName = "custom")
 
-    foreach ($skill in $SubSkills) {
-        $src  = Join-Path $RepoRoot $skill "SKILL.md"
-        $dest = Join-Path $TargetPath $skill
+    $dest = Join-Path $TargetPath $SkillName
 
-        New-Item -ItemType Directory -Force -Path (Join-Path $dest "fixtures") | Out-Null
-        New-Item -ItemType Directory -Force -Path (Join-Path $dest "scripts")  | Out-Null
-        Copy-Item -Path $src -Destination (Join-Path $dest "SKILL.md") -Force
-        Copy-Item -Path "$FixturesSource\*" -Destination (Join-Path $dest "fixtures") -Recurse -Force
-        Copy-Item -Path "$ScriptsSource\*" -Destination (Join-Path $dest "scripts") -Recurse -Force
-
-        Write-Host "  [$HarnessName] $skill -> $dest"
+    if (-not (Test-Path -LiteralPath $SkillSource -PathType Leaf)) {
+        Write-Host "  [$HarnessName] SKILL.md not found at $SkillSource — skipping"
+        return
     }
+
+    New-Item -ItemType Directory -Force -Path (Join-Path $dest "references") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $dest "fixtures")   | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $dest "scripts")    | Out-Null
+
+    # SKILL.md (entry point)
+    Copy-Item -Path $SkillSource -Destination (Join-Path $dest "SKILL.md") -Force
+
+    # references/ (32 deep-dive docs)
+    if (Test-Path -LiteralPath $ReferencesSource -PathType Container) {
+        Copy-Item -Path (Join-Path $ReferencesSource "*.md") `
+                  -Destination (Join-Path $dest "references") -Force
+    }
+
+    # fixtures/ (templates and JSON schemas)
+    if (Test-Path -LiteralPath $FixturesSource -PathType Container) {
+        Copy-Item -Path "$FixturesSource\*" `
+                  -Destination (Join-Path $dest "fixtures") -Recurse -Force
+    }
+
+    # scripts/ (Python utilities)
+    if (Test-Path -LiteralPath $ScriptsSource -PathType Container) {
+        Get-ChildItem -Path $ScriptsSource -Filter "*.py" -ErrorAction SilentlyContinue `
+            | ForEach-Object { Copy-Item -Path $_.FullName `
+                                         -Destination (Join-Path $dest "scripts") -Force }
+    }
+
+    Write-Host "  [$HarnessName] $SkillName -> $dest"
 }
 
 # ── Install ────────────────────────────────────────────────────────────────────
@@ -104,4 +128,4 @@ else {
     }
 }
 
-Write-Host "Done. $($SubSkills.Count) skills installed."
+Write-Host "Done. $SkillName installed."

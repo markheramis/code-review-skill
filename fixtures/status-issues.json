@@ -1,0 +1,13 @@
+{
+    "Pending": "Discovered but not triaged; filed from a deep-confirmed finding but not yet reviewed. Move to Reviewing when active triage starts. Tracker label alias: `pending`.",
+    "Reviewing": "Scope, validity, duplication, and dependencies are under review; type, scope, or acceptance criteria still being settled, or open questions remain. Move to Ready or Blocked. Tracker label alias: `reviewing`.",
+    "Ready": "Valid, scoped, dependency-clear, and implementable: type set, scope and acceptance criteria agreed, no blocking questions. Move to In Progress when implementation begins. Tracker label alias: `Ready for Development`. Only `Ready` issues are picked up by resolution.",
+    "In Progress": "An active implementation branch or equivalent work exists. Move to Completed or Blocked. Tracker label alias: `in-progress`.",
+    "Blocked": "A named dependency, missing capability, policy gate, or reproducible external failure prevents progress. Return to the prior active state only when evidence shows the blocker is removed. Tracker label alias: `blocked`.",
+    "Completed": "Fix and required validation/review are complete. Move to Closed after verified integration and reconciliation. Tracker label alias: `completed`.",
+    "Closed": "Integrated, reconciled, or intentionally declined with recorded rationale; the issue is closed in the tracker. Terminal unless explicitly reopened. Tracker label alias: `done`.",
+    "_meta": {
+        "$comment": "Lifecycle states for the work-item tracker. See workflow-manifest.json §lifecycle for valid transitions.",
+        "_transition_note": "Migration from the prior four-state model (Pending, Reviewing, Ready, Completed) to the seven-state contract. Old aliases are preserved where they map directly (`pending`, `reviewing`, `Ready for Development`). The prior `Completed` state covered both 'fix merged or accepted' and 'issue closed in the tracker'; its `done` alias now maps to the terminal `Closed` (integrated or intentionally declined), while the new `Completed` (implementation and gates complete) uses the `completed` alias. `In Progress`, `Blocked`, and `Closed` are newly added."
+    }
+}

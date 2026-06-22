@@ -1,0 +1,8 @@
+{
+    "Open": "Confirmed finding, not yet remediated; queued for work.",
+    "In-Progress": "Remediation started but interrupted or incomplete.",
+    "Completed": "Fixed and resolved (by remediation, or proven fixed by an identified merged commit).",
+    "Closed": "No longer applies; cited code, module, or feature was removed or superseded.",
+    "Accepted Risk": "Acknowledged but intentionally not fixed; rationale recorded.",
+    "Needs Verification": "Low-confidence or inconclusive; must be confirmed before any fix."
+}

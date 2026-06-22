@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs code-review sub-skills to Hermes skills directory.
+# Installs code-review skill to Hermes skills directory.
 # Path: ~/.hermes/skills/<skill-name>/SKILL.md (verified)
 
 set -euo pipefail

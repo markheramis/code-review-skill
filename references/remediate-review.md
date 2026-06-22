@@ -1,6 +1,14 @@
 ---
 name: remediate-review
-description: Apply fixes for Open findings in a review report, including security issues, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and other project improvements. Use after any review skill to work through findings one-by-one, implement fixes, run tests, and update report statuses. Not for finding new issues — only for resolving existing ones.
+description: "Apply fixes for Open findings in a review report, including security issues, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and other project improvements. Use after any review skill to work through findings one-by-one, implement fixes, run tests, and update report statuses. Not for finding new issues — only for resolving existing ones."
+version: 1.0.0
+author: Mark Heramis
+license: MIT
+platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [code-review, evidence-first, orchestration, remediation]
+    related_skills: [evidence-first-code-review]
 ---
 
 # Remediate Review

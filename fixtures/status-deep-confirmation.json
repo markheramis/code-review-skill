@@ -1,0 +1,6 @@
+{
+    "No": "Disproved or incomplete. At least one enumerated empirical claim was NOT reproduced by the baseline experiment, OR was reproduced but NOT resolved by the candidate fix. Includes the former Partially / Ineffective / Inconclusive outcomes — any single unresolved claim collapses here. Record a per-claim breakdown in the Deep Confirmation block.",
+    "Yes": "Complete. Every enumerated empirical claim in the finding was reproduced by the baseline experiment AND resolved by the candidate fix. An experiment actually ran this session; never set Yes on reasoning alone.",
+    "N/A": "Auto-skipped. The finding makes no testable empirical claim (style, documentation, architectural opinion without correctness/security impact), or the cited code is gone/already-fixed at current head.",
+    "Blocked": "Cannot run the experiment. Required dependency, external service, environment, or data is unavailable, making the claim un-testable this session. Distinct from No (disproved) — Blocked is retryable, not a verdict on the claim. Document the blocker; the finding stays in the unconfirmed queue for retry."
+}

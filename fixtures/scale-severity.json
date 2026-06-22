@@ -1,0 +1,7 @@
+{
+    "Critical": "Likely exploitable or production-breaking issue with severe business, security, data integrity, or availability impact. Requires immediate remediation.",
+    "High": "Significant bug, vulnerability, data loss risk, broken contract, or serious maintainability problem likely to affect production.",
+    "Medium": "Real issue with limited scope, moderate risk, missing validation, fragile behavior, or likely future defect.",
+    "Low": "Minor correctness, maintainability, readability, observability, feature, or test coverage issue.",
+    "Informational": "Observation, improvement opportunity, or context that does not require immediate action."
+}

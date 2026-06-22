@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Installs code-review sub-skills to agent harness skills directories.
-# Each sub-skill gets its own directory with a copy of shared fixtures and scripts.
+# Installs the evidence-first-code-review skill to agent harness skills directories.
+# The skill installs as a single SKILL.md with references/, fixtures/, and scripts/.
 #
 # Usage:
-#   ./install.sh                    # install to all detected harnesses
+#   ./install.sh                    # install to every detected harness
 #   ./install.sh --harness agents   # install to generic .agents skills only
 #   ./install.sh --harness claude   # install to Claude Code only
 #   ./install.sh --harness codex    # install to Codex only
@@ -14,14 +14,16 @@
 #   ./install.sh --harness trae     # install to Trae only
 #   ./install.sh --harness vscode   # install to VS Code Copilot only
 #   ./install.sh --harness windsurf # install to Windsurf only
-#   ./install.sh --target /custom/path  # install to custom path
+#   ./install.sh --target /custom/path  # install to a custom skills root
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SKILL_NAME="evidence-first-code-review"
+SKILL_SOURCE="$REPO_ROOT/SKILL.md"
+REFERENCES_SOURCE="$REPO_ROOT/references"
 FIXTURES_SOURCE="$REPO_ROOT/fixtures"
 SCRIPTS_SOURCE="$REPO_ROOT/scripts"
-SUB_SKILLS=(commit-review branch-review pr-review repo-review remediate-review verify-report)
 
 # ── Harness paths ──────────────────────────────────────────────────────────────
 # verified on this workstation: agents, claude, cline, codex, continue, cursor,
@@ -65,22 +67,38 @@ harness_path() {
     return 1
 }
 
+# Install the single skill into a target directory.
 install_to() {
     local target="$1"
     local harness="${2:-custom}"
+    local dest="$target/$SKILL_NAME"
 
-    for skill in "${SUB_SKILLS[@]}"; do
-        local src="$REPO_ROOT/$skill/SKILL.md"
-        local dest="$target/$skill"
+    if [[ ! -f "$SKILL_SOURCE" ]]; then
+        echo "  [$harness] SKILL.md not found at $SKILL_SOURCE — skipping"
+        return 1
+    fi
 
-        mkdir -p "$dest/fixtures"
-        mkdir -p "$dest/scripts"
-        cp "$src" "$dest/SKILL.md"
-        cp -r "$FIXTURES_SOURCE/." "$dest/fixtures/"
-        cp "$SCRIPTS_SOURCE"/*.py "$dest/scripts/"
+    mkdir -p "$dest/references" "$dest/fixtures" "$dest/scripts"
 
-        echo "  [$harness] $skill -> $dest"
-    done
+    # SKILL.md (entry point)
+    cp "$SKILL_SOURCE" "$dest/SKILL.md"
+
+    # references/ (32 deep-dive docs)
+    if [[ -d "$REFERENCES_SOURCE" ]]; then
+        cp "$REFERENCES_SOURCE"/*.md "$dest/references/"
+    fi
+
+    # fixtures/ (templates and JSON schemas)
+    if [[ -d "$FIXTURES_SOURCE" ]]; then
+        cp -r "$FIXTURES_SOURCE"/. "$dest/fixtures/"
+    fi
+
+    # scripts/ (Python utilities)
+    if [[ -d "$SCRIPTS_SOURCE" ]]; then
+        cp "$SCRIPTS_SOURCE"/*.py "$dest/scripts/" 2>/dev/null || true
+    fi
+
+    echo "  [$harness] $SKILL_NAME -> $dest"
 }
 
 # ── Parse args ─────────────────────────────────────────────────────────────────
@@ -115,7 +133,7 @@ elif [[ -n "$HARNESS" ]]; then
 else
     # Auto-detect: install to every known harness, creating the skills
     # directory if it does not already exist. This way a single
-    # `./install/install.sh` works on a fresh machine.
+    # ./install/install.sh works on a fresh machine.
     installed=0
     for i in "${!HARNESS_KEYS[@]}"; do
         harness="${HARNESS_KEYS[$i]}"
@@ -129,10 +147,10 @@ else
         install_to "$path" "$harness"
         installed=$((installed + 1))
     done
-    if [[ $installed -eq 0 ]]; then
+    if [[ "$installed" -eq 0 ]]; then
         echo "No known harness skills directories found. Use --target for an explicit custom path."
         exit 1
     fi
 fi
 
-echo "Done. ${#SUB_SKILLS[@]} skills installed to ${installed} harness(es)."
+echo "Done. $SKILL_NAME installed."

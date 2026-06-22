@@ -1,23 +1,23 @@
 ---
-name: branch-review
-description: Review a feature branch diff against a base branch for correctness, security, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and overall quality. Use when asked to review a branch, check accumulated changes before merge, audit a feature branch, or assess regression risk from a set of commits. Not for single commits or full PRs with metadata.
+name: commit-review
+description: "Review a single git commit for correctness, security, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and overall quality. Use when asked to review a specific commit, audit a patch, check what a commit introduces, or verify a squashed change before push. Not for branch diffs or full PRs."
+version: 1.0.0
+author: Mark Heramis
+license: MIT
+platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [code-review, evidence-first, orchestration]
+    related_skills: [evidence-first-code-review]
 ---
 
-# Branch Review
+# Commit Review
 
-## Scope and Depth Detection
+## Scope
 
-Target: diff between feature branch and base branch. If no feature branch is provided, ask what branch to review before running review commands. If no base branch is provided, use `main` as the default base. Obtain via `git diff <base>..<branch>`.
+Target: single commit. If no commit hash or ref is provided, ask what commit to review before running review commands. Do not default to `HEAD` unless the user explicitly selects it. Obtain the diff via `git show <hash_or_ref>`.
 
-Calibrate depth based on change size:
-
-| Size | Lines changed | Files changed | Depth |
-|------|--------------|--------------|-------|
-| Small | ≤200 | ≤10 | Changes + directly called/imported symbols |
-| Medium | ≤1000 | ≤30 | Changes + adjacent modules + affected tests |
-| Large | >1000 or >30 | — | Full workflow: architecture, security, coverage, dependencies |
-
-Start from the diff only. Expand to additional files only for symbols directly touched by the changes or to assess downstream impact. Stop expanding once all changed symbols are traced and adjacency impact is assessed.
+Depth is always targeted — inspect only files and symbols touched by the commit. Expand to callers or importers only when the change modifies a public API or shared contract.
 
 ## Review Lenses
 
@@ -30,40 +30,39 @@ Treat the review as both defect detection and project improvement discovery. Loo
 - Test coverage gaps: missing unit, integration, regression, security, error-path, and performance coverage.
 - Feature, product, usability, operational, observability, documentation, and developer-experience improvements that would materially help the project.
 
-Keep suggestions tied to the branch diff or directly affected behavior. Include broader project issues only when the branch introduces, exposes, or depends on them.
+Keep suggestions tied to this commit or directly affected behavior. Include broader project issues only when the commit introduces, exposes, or depends on them.
 
 ## Report Output
 
 Before starting:
 
-1. Check memory for a saved report directory path (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
+1. Check memory for a saved report directory path for the current project (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
 2. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as `code-review.report_dir`, write report as `branch-<name>-review-YYYY-MM-DD-HHmm.md`.
+   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `commit-<hash>-review-YYYY-MM-DD-HHmm.md`.
    - No path: output directly. Ask again next time.
-3. If report directory is known, glob for `branch-<name>-review-*.md` in that directory. For each match (sorted oldest-first), run `python scripts/get-report-headings.py <report>` to map heading line ranges, then use `python scripts/get-heading-content.py <report> --title <heading>` to surgically read only: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
-   - Understand which files and modules were already covered.
-   - Avoid repeating confirmed findings; focus inspection on areas listed in Excluded or Limitations.
-   - Prioritize any previously Low-confidence findings that warrant re-examination.
+3. If report directory is known, glob for `commit-<hash>-review-*.md` in that directory. For each match (sorted oldest-first), run `python scripts/get-report-headings.py <report>` to map heading line ranges, then use `python scripts/get-heading-content.py <report> --title <heading>` to surgically read only: `## Executive Summary`, `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
+   - Avoid re-confirming findings already marked Completed in prior reviews.
+   - Elevate findings previously marked Low confidence that may now have more evidence.
+   - Note findings recurring across multiple reviews.
 4. **Determine next finding ID:** If the report directory is known and reports will be saved, run `python scripts/get-next-finding-id.py <report_dir>` to get the starting ID for findings in this report. If no directory is set (output-only), start at `F-001`. Record the starting ID.
 
 ## Workflow
 
-1. If the feature branch is missing, ask the user what branch to review. Then run `git diff <base>..<branch>` to read the full diff. Record branch names and commit range. Run `git log <base>..<branch> --oneline` to understand commit history.
-2. Calibrate depth using the size table above.
-3. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
-4. Inventory test coverage tooling separately by checking project scripts, dependency manifests, coverage config, CI config, and language-specific tools in `fixtures/lang-checklist.md`. Run available, relevant, and safe coverage commands. If no coverage tool is present or it cannot run safely, explain that in `## Test Coverage Review` and `### Coverage Tooling`.
-5. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
-6. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
-7. Inspect changed files surgically: project structure, symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
-8. Run independent tools, checks, coverage commands, and research tasks concurrently.
-9. Gather evidence in order: branch diff, commit log, tool output, coverage output, code intelligence results, repository and external documentation, surrounding source context, git blame for ambiguous changes.
-10. When unsure, prove or disprove — run targeted tests, static analysis, coverage checks, or small repros.
-11. For suspected runtime-behavior findings, try the smallest safe executable check before confirming the issue: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the suspected edge case. Use the actual implementation under review; do not mock away the behavior being tested.
-12. If a small executable repro is feasible but was not run, do not present the concern as confirmed. Assign lower confidence and state the missing validation.
-13. Keep temporary validation artifacts isolated in a safe path. Remove after use unless promoting them into real regression tests. If retained, say why.
-14. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
-15. Record exact commands, tools, coverage tooling checked, output, research sources, temporary artifacts created, and cleanup status. Do not claim tests or coverage checks passed unless run in this review.
-16. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `## Report Output Rules`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. Before writing the report, perform a template compliance pass: compare the draft against `fixtures/report-template.md`, restore any missing section, heading, table, or appendix item, and fill not-applicable areas with `None found`, `Not reviewed`, or `Unknown` plus a brief reason.
+1. If the commit hash or ref is missing, ask the user what commit to review. Then run `git show <hash_or_ref>` to obtain the full diff. Record the resolved commit hash, author, date, and message.
+2. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
+3. Inventory test coverage tooling separately by checking project scripts, dependency manifests, coverage config, CI config, and language-specific tools in `fixtures/lang-checklist.md`. Run available, relevant, and safe coverage commands. If no coverage tool is present or it cannot run safely, explain that in `## Test Coverage Review` and `### Coverage Tooling`.
+4. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
+5. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
+6. For each changed file: read the diff, identify touched symbols, trace to callers and tests. Assess correctness and security of the specific change.
+7. Run independent tools, checks, coverage commands, and research tasks concurrently.
+8. Gather evidence in order: commit diff, tool output, coverage output, code intelligence results, repository and external documentation, surrounding source context, git log for affected files.
+9. When unsure, prove or disprove — run targeted tests, static analysis, coverage checks, or small repros.
+10. For suspected runtime-behavior findings, try the smallest safe executable check before confirming the issue: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the suspected edge case. Use the actual implementation under review; do not mock away the behavior being tested.
+11. If a small executable repro is feasible but was not run, do not present the concern as confirmed. Assign lower confidence and state the missing validation.
+12. Keep temporary validation artifacts isolated in a safe path. Remove after use unless promoting them into real regression tests. If retained, say why.
+13. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
+14. Record exact commands, tools, coverage tooling checked, output, research sources, temporary artifacts created, and cleanup status. Do not claim tests or coverage checks passed unless run in this review.
+15. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `## Report Output Rules`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. Before writing the report, perform a template compliance pass: compare the draft against `fixtures/report-template.md`, restore any missing section, heading, table, or appendix item, and fill not-applicable areas with `None found`, `Not reviewed`, or `Unknown` plus a brief reason.
 
 ## Report Output Rules
 

@@ -1,6 +1,14 @@
 ---
 name: verify-report
-description: Verify findings marked "Needs Verification" in a review report. Checks each finding against the current codebase, conducts research, determines if the issue is real and actionable, and either resolves it or escalates to the user. Use after any review skill when findings require confirmation before remediation. Not for finding new issues — only for verifying or disproving existing ones.
+description: "Verify findings marked \"Needs Verification\" in a review report. Checks each finding against the current codebase, conducts research, determines if the issue is real and actionable, and either resolves it or escalates to the user. Use after any review skill when findings require confirmation before remediation. Not for finding new issues — only for verifying or disproving existing ones."
+version: 1.0.0
+author: Mark Heramis
+license: MIT
+platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [code-review, evidence-first, orchestration, reporting]
+    related_skills: [evidence-first-code-review]
 ---
 
 # Verify Report

@@ -1,23 +1,31 @@
 ---
-name: repo-review
-description: Review or audit an entire repository for security, architecture, correctness, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, maintainability, and overall project quality. Use when asked to audit a codebase, review overall code quality, assess security posture, produce a formal remediation report, or review a repository with no specific PR or branch target.
+name: branch-review
+description: "Review a feature branch diff against a base branch for correctness, security, optimization opportunities, complexity reduction, test coverage gaps, feature improvements, and overall quality. Use when asked to review a branch, check accumulated changes before merge, audit a feature branch, or assess regression risk from a set of commits. Not for single commits or full PRs with metadata."
+version: 1.0.0
+author: Mark Heramis
+license: MIT
+platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [code-review, evidence-first, orchestration]
+    related_skills: [evidence-first-code-review]
 ---
 
-# Repository Review
+# Branch Review
 
-## Scope
+## Scope and Depth Detection
 
-Target: full repository. No diff — assess the codebase as it stands. Use risk-surface triage to prioritize coverage.
+Target: diff between feature branch and base branch. If no feature branch is provided, ask what branch to review before running review commands. If no base branch is provided, use `main` as the default base. Obtain via `git diff <base>..<branch>`.
 
-Inspect in this priority order:
+Calibrate depth based on change size:
 
-1. **Entry points** — HTTP handlers, CLI commands, public APIs, event handlers, message consumers
-2. **Trust boundaries** — authentication, authorization, input validation gates
-3. **Data persistence** — DB queries, file writes, cache writes, external state mutations
-4. **External calls** — outbound HTTP, process execution, file system access
-5. **Internal logic and error propagation** — business rules, error handling, state transitions
+| Size | Lines changed | Files changed | Depth |
+|------|--------------|--------------|-------|
+| Small | ≤200 | ≤10 | Changes + directly called/imported symbols |
+| Medium | ≤1000 | ≤30 | Changes + adjacent modules + affected tests |
+| Large | >1000 or >30 | — | Full workflow: architecture, security, coverage, dependencies |
 
-Stop when all identified high-risk surfaces have been assessed and a confirming pass finds no new findings at Medium severity or above. Record everything not covered in `Limitations`.
+Start from the diff only. Expand to additional files only for symbols directly touched by the changes or to assess downstream impact. Stop expanding once all changed symbols are traced and adjacency impact is assessed.
 
 ## Review Lenses
 
@@ -30,40 +38,39 @@ Treat the review as both defect detection and project improvement discovery. Loo
 - Test coverage gaps: missing unit, integration, regression, security, error-path, and performance coverage.
 - Feature, product, usability, operational, observability, documentation, and developer-experience improvements that would materially help the project.
 
-Because this is a full-repository review, capture project-wide opportunities when evidence shows they would materially reduce risk, cost, complexity, or user/developer friction.
+Keep suggestions tied to the branch diff or directly affected behavior. Include broader project issues only when the branch introduces, exposes, or depends on them.
 
 ## Report Output
 
 Before starting:
 
-1. Check memory for a saved report directory path for the current project (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
+1. Check memory for a saved report directory path (`code-review.report_dir`). Treat it as project-specific; do not reuse a path saved for a different project.
 2. If not found, ask: *"Where should I save the review report? (Leave blank to print output only.)"*
-   - Path provided: save to memory as the current project's `code-review.report_dir`, write report as `repo-review-YYYY-MM-DD-HHmm.md`.
+   - Path provided: save to memory as `code-review.report_dir`, write report as `branch-<name>-review-YYYY-MM-DD-HHmm.md`.
    - No path: output directly. Ask again next time.
-3. If report directory is known, glob for `repo-review-*.md` in that directory. For each match (sorted oldest-first), run `python scripts/get-report-headings.py <report>` to map heading line ranges, then use `python scripts/get-heading-content.py <report> --title <heading>` to surgically read only: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
-   - Build a map of which areas (modules, entry points, trust boundaries) have already been assessed.
-   - Skip re-reviewing already-confirmed findings unless new evidence changes the picture.
-   - Focus the current review on: areas listed in Excluded/Limitations, areas changed since the last review (cross-check with git log), and previously Low-confidence findings.
-   - Record coverage progress — note in the new report's Scope/Excluded what prior reviews already covered.
+3. If report directory is known, glob for `branch-<name>-review-*.md` in that directory. For each match (sorted oldest-first), run `python scripts/get-report-headings.py <report>` to map heading line ranges, then use `python scripts/get-heading-content.py <report> --title <heading>` to surgically read only: `## Executive Summary`, `## Scope` (all three sub-sections), `## Findings Summary`, and `## Context` → `### Limitations`. Use these to:
+   - Understand which files and modules were already covered.
+   - Avoid repeating confirmed findings; focus inspection on areas listed in Excluded or Limitations.
+   - Prioritize any previously Low-confidence findings that warrant re-examination.
 4. **Determine next finding ID:** If the report directory is known and reports will be saved, run `python scripts/get-next-finding-id.py <report_dir>` to get the starting ID for findings in this report. If no directory is set (output-only), start at `F-001`. Record the starting ID.
 
 ## Workflow
 
-1. Map the repository: project structure, entry points, key modules, external dependencies. Use git log to understand recent activity and hotspots.
-2. Triage risk surface using the priority order above. Identify the highest-risk areas before inspecting any code.
-3. Check the report directory (if known) for prior reviews — use them to understand what was already covered and focus effort on what is new or changed.
-4. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
-5. Inventory test coverage tooling separately by checking project scripts, dependency manifests, coverage config, CI config, and language-specific tools in `fixtures/lang-checklist.md`. Run available, relevant, and safe coverage commands. If no coverage tool is present or it cannot run safely, explain that in `## Test Coverage Review` and `### Coverage Tooling`.
-6. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
-7. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
-8. Where tools, checks, coverage commands, and research tasks are independent, run them concurrently.
-9. Inspect surgically in priority order: project structure, symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
-10. When unsure, prove or disprove — run targeted tests, build checks, static analysis, coverage checks, or small repros.
+1. If the feature branch is missing, ask the user what branch to review. Then run `git diff <base>..<branch>` to read the full diff. Record branch names and commit range. Run `git log <base>..<branch> --oneline` to understand commit history.
+2. Calibrate depth using the size table above.
+3. Inventory available review tools (see `fixtures/lang-checklist.md`). Run every available, relevant, and safe tool.
+4. Inventory test coverage tooling separately by checking project scripts, dependency manifests, coverage config, CI config, and language-specific tools in `fixtures/lang-checklist.md`. Run available, relevant, and safe coverage commands. If no coverage tool is present or it cannot run safely, explain that in `## Test Coverage Review` and `### Coverage Tooling`.
+5. Inventory available code intelligence capabilities. Use every available, relevant, and safe capability to navigate definitions, references, symbols, call paths, type information, and dependency relationships.
+6. Research supporting context: search repository documentation first; if a RAG or context-retrieval system is available, query it for project docs, architecture notes, requirements, runbooks, and prior decisions; when internet access is available, check official or primary external documentation for libraries, frameworks, APIs, protocols, advisories, and behavior that would materially improve the review.
+7. Inspect changed files surgically: project structure, symbol definitions, references/usages, dependencies, targeted search, small excerpts, control/data flow, then git history. Use full-file reads only when exact surrounding context is required.
+8. Run independent tools, checks, coverage commands, and research tasks concurrently.
+9. Gather evidence in order: branch diff, commit log, tool output, coverage output, code intelligence results, repository and external documentation, surrounding source context, git blame for ambiguous changes.
+10. When unsure, prove or disprove — run targeted tests, static analysis, coverage checks, or small repros.
 11. For suspected runtime-behavior findings, try the smallest safe executable check before confirming the issue: an existing focused test, a temporary test case, a throwaway script/program, or a REPL snippet that imports the real code path and exercises the suspected edge case. Use the actual implementation under review; do not mock away the behavior being tested.
 12. If a small executable repro is feasible but was not run, do not present the concern as confirmed. Assign lower confidence and state the missing validation.
 13. Keep temporary validation artifacts isolated in a safe path. Remove after use unless promoting them into real regression tests. If retained, say why.
-14. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`. Use `Unknown` only after reasonable evidence-gathering has failed or is blocked.
-15. Record exact commands, tools, coverage tooling checked, observed output, temporary artifacts created, research sources, and cleanup status. Do not claim tests or coverage checks passed unless they ran in the current review.
+14. Separate every conclusion into `Confirmed`, `Assumption`, `Unknown`, or `Validation`.
+15. Record exact commands, tools, coverage tooling checked, output, research sources, temporary artifacts created, and cleanup status. Do not claim tests or coverage checks passed unless run in this review.
 16. Draft output by copying `fixtures/report-template.md` as the authoritative schema. Apply every rule in `## Report Output Rules`. Replace the template tag line with `#CodeReview` first, followed by tags specific to the report findings. Before writing the report, perform a template compliance pass: compare the draft against `fixtures/report-template.md`, restore any missing section, heading, table, or appendix item, and fill not-applicable areas with `None found`, `Not reviewed`, or `Unknown` plus a brief reason.
 
 ## Report Output Rules

@@ -1,0 +1,253 @@
+{
+  "version": "1.0.0",
+  "description": "Versioned sidecar manifest for Kilo orchestrator commands. Stores stage dependencies, gates, compatibility aliases, lifecycle transitions, and capability references that the documented frontmatter (description, agent, model, subtask) cannot hold. Neutral vocabulary only: work item (not issue), change request (not pull/merge request), repository host (not provider-specific names).",
+  "agent_model": {
+    "orchestrator": "composes leaves and sub-orchestrators by name; returns completed|skipped|blocked|failed per stage",
+    "leaf": "single bounded write or read; returns one structured packet",
+    "subtask": "delegated scoped work; returns one packet"
+  },
+  "commands": {
+    "development-workflow.md": {
+      "agent": "orchestrator",
+      "role": "master opt-in orchestrator",
+      "stages": [
+        { "name": "discover", "runs": ["node tools/get-repository-context.mjs", "merge-capability-overlay"], "returns": "repository identity + capability overlay" },
+        { "name": "inventory", "runs": ["code-review-inventory.md"], "returns": "reports, work items, branches, change requests, comments, reviews, checks, automation state" },
+        { "name": "work_item_reconcile", "runs": ["work-item-label-sync.md", "work-item-comment-resolution.md"], "returns": "label delta + comment queue" },
+        { "name": "resolve", "runs": ["issue-resolution.md", "code-review-report-resolution.md"], "returns": "one item resolved or bounded burn-down" },
+        { "name": "change_request", "runs": ["create-or-reuse-change-request"], "returns": "change-request id", "mutation": true },
+        { "name": "change_request_reconcile", "runs": ["change-request-label-sync.md", "change-request-comment-resolution.md"], "returns": "label delta + comment thread state" },
+        { "name": "conflict_and_automation", "runs": ["change-request-conflict-resolution.md", "automation-run-resolution.md"], "returns": "clean merge + passing checks", "mutation": true },
+        { "name": "integrate", "runs": ["integration-queue-or-merge"], "returns": "integration result", "mutation": true, "gate": "explicit confirmation or predeclared policy" },
+        { "name": "reconcile", "runs": ["post-integration-reconciliation.md"], "returns": "remote/local sync of work items, change requests, labels, findings, branches" },
+        { "name": "release", "runs": ["release-resolution.md", "deployment-verification.md"], "returns": "release + deployment result", "mutation": true, "gate": "explicit request or mandated policy" }
+      ],
+      "gates": [
+        "stop if any prerequisite returns blocked|failed|invalid",
+        "mutation stages (5, 7, 8, 10) require completed discovery (stage 1)",
+        "integration, release, and deployment require explicit confirmation or predeclared policy",
+        "read-back after every mutation leaf",
+        "a blocked or failed prerequisite stops later mutation stages"
+      ],
+      "aliases": [],
+      "depends_on": []
+    },
+    "code-review.md": {
+      "agent": "orchestrator",
+      "role": "evidence-first repository review producing a remediation-ready report",
+      "stages": [
+        "code-review-inventory.md",
+        "code-review-baseline-map.md",
+        "code-review-risk-scan.md",
+        "code-review-finding-verification.md",
+        "code-review-experiment-summary.md"
+      ],
+      "gates": [
+        "stop if a leaf returns blocked|failed|invalid",
+        "read-back after every mutation leaf"
+      ],
+      "aliases": [],
+      "depends_on": ["code-review-deep-confirm.md", "code-review-create-issues.md"]
+    },
+    "code-review-deep-confirm.md": {
+      "agent": "orchestrator",
+      "role": "deep confirmation of report findings via comparative experiment",
+      "stages": [
+        "code-review-deep-confirm-classify.md",
+        "code-review-finding-verification.md",
+        "code-review-deep-confirm-experiment.md",
+        "code-review-deep-confirm-record.md"
+      ],
+      "gates": [
+        "stop if a leaf returns blocked|failed|invalid",
+        "read-back after every mutation leaf",
+        "one finding at a time; never parallelize skip/confirm or report edits"
+      ],
+      "aliases": [],
+      "depends_on": []
+    },
+    "code-review-report-resolution.md": {
+      "agent": "orchestrator",
+      "role": "sequential bounded burn-down of resolvable report findings",
+      "stages": [
+        "code-review-report-queue.md",
+        "code-review-report-triage.md",
+        "code-review-staleness-check.md",
+        "code-review-finding-verification.md",
+        "code-review-experiment-summary.md",
+        "code-review-finding-branch-plan.md",
+        "code-review-remediate-finding.md",
+        "code-review-report-note-draft.md",
+        "code-review-report-finalize.md"
+      ],
+      "gates": [
+        "stop if a leaf returns blocked|failed|invalid",
+        "read-back after every mutation leaf",
+        "select next eligible finding deterministically by severity, dependency, report order",
+        "change-request secrecy: never mention report path, finding IDs, severity labels in commit/PR text",
+        "one finding at a time; no parallel edits, branch ops, or validation"
+      ],
+      "aliases": [],
+      "depends_on": ["issue-resolution.md"]
+    },
+    "code-review-remediate-finding.md": {
+      "agent": "orchestrator",
+      "role": "single-finding remediation composed of verify/experiment/implement/validate/warn/cleanup leaves; delegated to a specialist",
+      "stages": [
+        "code-review-remediate-verify.md",
+        "code-review-remediate-experiment.md",
+        "code-review-remediate-implement.md",
+        "code-review-remediate-validate.md",
+        "code-review-remediate-warn.md",
+        "code-review-remediate-cleanup.md",
+        "code-review-remediate-packet.md"
+      ],
+      "gates": [
+        "stop and return packet if a leaf returns disproven|blocked",
+        "read-back git status before returning the packet",
+        "never commit, branch, push, open PRs, or edit reports (main agent only)"
+      ],
+      "aliases": [],
+      "depends_on": []
+    },
+    "issue-resolution.md": {
+      "agent": "orchestrator",
+      "role": "resolve one Ready work item via the canonical one-item procedure",
+      "stages": [
+        "issue-resolution-context.md",
+        "issue-resolution-gate.md",
+        "code-review-finding-verification.md",
+        "code-review-experiment-summary.md",
+        "code-review-finding-branch-plan.md",
+        "code-review-remediate-finding.md",
+        "issue-resolution-comment.md",
+        "code-review-report-note-draft.md",
+        "code-review-report-finalize.md"
+      ],
+      "gates": [
+        "stop if issue-resolution-gate returns stop_not_ready|stop_closed",
+        "work the item only when the gate returns proceed",
+        "read-back both remote and local state after every mutation"
+      ],
+      "aliases": [],
+      "depends_on": []
+    },
+    "change-request-comment-resolution.md": {
+      "agent": "orchestrator",
+      "role": "inventory and sequential resolution of actionable change-request comments",
+      "stages": [
+        "change-request-comment-inventory.md",
+        "change-request-comment-resolve.md",
+        "code-review-report-finalize.md"
+      ],
+      "gates": [
+        "stop if inventory returns blocked or the actionable queue is empty",
+        "push before reply on every iteration; never reply before validation passes",
+        "read back reply and thread state after each iteration",
+        "one comment at a time; no parallel edits or validation"
+      ],
+      "aliases": ["pull-request-comment-resolution.md"],
+      "depends_on": []
+    },
+    "change-request-conflict-resolution.md": {
+      "agent": "subtask",
+      "role": "resolve merge conflicts on a change request (subtask, not an orchestrator)",
+      "stages": [
+        "fetch-change-request-metadata",
+        "inspect-both-sides",
+        "merge-target-into-source",
+        "resolve-conflicted-files-by-intent",
+        "validate-targeted-then-full",
+        "commit-and-push"
+      ],
+      "gates": [
+        "stop on validation failure",
+        "never force-push, force-delete, or reset without explicit confirmation",
+        "do not change change-request status here"
+      ],
+      "aliases": ["pull-request-conflict-resolution.md"],
+      "depends_on": []
+    },
+    "automation-run-resolution.md": {
+      "agent": "orchestrator",
+      "role": "resolve one failed automation run — inspect, reproduce, fix, retry the failed scope",
+      "stages": [
+        "automation-run-inspect",
+        "automation-run-reproduce",
+        "automation-run-fix",
+        "automation-run-retry"
+      ],
+      "gates": [
+        "stop if inspect returns blocked|invalid",
+        "skip fix/retry when reproduce returns not_feasible and no changed hypothesis",
+        "retry is distinct from cancel and delete; require explicit confirmation or predeclared policy",
+        "at most one retry per changed hypothesis; mark Blocked on a second identical hypothesis"
+      ],
+      "aliases": [],
+      "depends_on": []
+    }
+  },
+  "compatibility_aliases": {
+    "pull-request-comment-resolution.md": {
+      "target": "change-request-comment-resolution.md",
+      "notice": "deprecated compatibility alias; redirect inputs to the neutral contract"
+    },
+    "pull-request-conflict-resolution.md": {
+      "target": "change-request-conflict-resolution.md",
+      "notice": "deprecated compatibility alias; redirect inputs to the neutral contract"
+    }
+  },
+  "lifecycle": {
+    "source": "fixtures/status-issues.json",
+    "states": ["Pending", "Reviewing", "Ready", "In Progress", "Blocked", "Completed", "Closed"],
+    "transitions": {
+      "Pending": ["Reviewing"],
+      "Reviewing": ["Ready", "Blocked"],
+      "Ready": ["In Progress", "Blocked"],
+      "In Progress": ["Completed", "Blocked"],
+      "Blocked": "return to prior active state only when the blocker is removed",
+      "Completed": ["Closed"],
+      "Closed": "terminal unless explicitly reopened"
+    },
+    "resolution_gate": "only Ready work items are picked up by resolution"
+  },
+  "capabilities": {
+    "source": "tools/lib/capability-registry.mjs",
+    "keys": {
+      "repository": ["read", "search", "refs"],
+      "workItem": ["read", "search", "create", "update", "close", "reopen", "comment", "label"],
+      "changeRequest": ["read", "search", "create", "update", "mergeability", "comment", "label"],
+      "review": ["decision", "inlineComment", "threadReply", "threadResolve"],
+      "automation": ["definition", "run", "job", "log", "check", "retry", "cancel"],
+      "integrationQueue": ["read", "enqueue", "status"],
+      "release": ["environment", "deployment", "artifact"]
+    },
+    "transport_priority": "MCP > native CLI > raw API via CLI > local git (local-only ops)",
+    "rule": "never claim an unsupported capability without a fallback or blocking path"
+  },
+  "stage_status_enum": ["completed", "skipped", "blocked", "failed"],
+  "report_model": {
+    "contract": "one-finding-per-file",
+    "filename_pattern": "F-NNN-<slug>.md",
+    "filename_rules": "NNN is zero-padded; <slug> is lower-kebab-case from the finding title, <=40 chars; the filename never renames after creation (the title lives in frontmatter)",
+    "frontmatter_schema": {
+      "required": ["id", "title", "severity", "confidence", "category", "status", "deep_confirmed", "issue"],
+      "optional": ["depends_on", "affected_paths", "project", "repository", "commit", "branch", "datetime", "tags"],
+      "single_source_of_truth": "frontmatter is canonical for finding metadata; never duplicate metadata as **Key:** lines in the body"
+    },
+    "frontmatter_enums": {
+      "severity": "fixtures/scale-severity.json",
+      "confidence": "fixtures/scale-confidence.json",
+      "status": "fixtures/status-findings.json",
+      "deep_confirmed": "fixtures/status-deep-confirmation.json"
+    },
+    "finding_identity": "the finding ID IS the file; findingFileFromId(dir, id) resolves F-NNN-*.md",
+    "directory_operations": "queue/dependency/dedup operations scan the report directory of finding files reading frontmatter only — no Findings Summary table exists",
+    "prior_findings_index": "dedup and prior-findings harvest read each finding file's frontmatter (id, title, category, status), never the bodies",
+    "initial_values": {
+      "status": "Open",
+      "deep_confirmed": "No",
+      "issue": "—"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+    "High": "Directly confirmed from code, tests, logs, or reproducible behavior.",
+    "Medium": "Strongly indicated by available evidence but not fully reproduced.",
+    "Low": "Plausible concern that needs more data before treating as confirmed."
+}

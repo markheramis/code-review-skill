@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs code-review sub-skills to Junie skills directory.
+# Installs code-review skill to Junie skills directory.
 # Path: ~/.junie/skills/<skill-name>/SKILL.md (verified)
 
 set -euo pipefail
