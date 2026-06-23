@@ -24,8 +24,7 @@ Remediate one finding end-to-end as the specialist agent. Apply specialist rules
 
 ## Config
 
-- `KILO_CONFIG_ROOT` - `~/.config/kilo`
-- `KILO_FINDINGS_STATUS` - Status lifecycle
+- Status lifecycle — `fixtures/status-findings.json` (bundled)
 
 ## Inputs
 

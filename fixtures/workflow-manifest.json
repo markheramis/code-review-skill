@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "description": "Versioned sidecar manifest for Kilo orchestrator commands. Stores stage dependencies, gates, compatibility aliases, lifecycle transitions, and capability references that the documented frontmatter (description, agent, model, subtask) cannot hold. Neutral vocabulary only: work item (not issue), change request (not pull/merge request), repository host (not provider-specific names).",
+  "description": "Versioned sidecar manifest for evidence-first-code-review orchestrator stages. Stores stage dependencies, gates, compatibility aliases, lifecycle transitions, and capability references that the documented frontmatter (description, agent, model, subtask) cannot hold. Neutral vocabulary only: work item (not issue), change request (not pull/merge request), repository host (not provider-specific names).",
   "agent_model": {
     "orchestrator": "composes leaves and sub-orchestrators by name; returns completed|skipped|blocked|failed per stage",
     "leaf": "single bounded write or read; returns one structured packet",

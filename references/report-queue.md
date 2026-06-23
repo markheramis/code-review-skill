@@ -24,12 +24,12 @@ Build a deterministic remediation queue from the report's Open findings. Sort by
 
 ## Inputs
 
-- Report directory under `KILO_REPORT_DIRECTORY` (directory of finding files)
-- `KILO_FINDINGS_STATUS` - `<KILO_CONFIG_ROOT>/fixtures/status-findings.json`
+- Report directory — defaults to `.ai/reports/` (directory of finding files)
+- Status lifecycle — `fixtures/status-findings.json` (bundled)
 
 ## Tools
 
-- `~/.config/kilo/tools/build-remediation-queue.mjs` - Builds deterministic remediation queue
+- `scripts/get-findings-by-status.py --status Open` - List Open findings to build the queue
 
 ## Output Schema
 
@@ -129,11 +129,22 @@ report-queue → report-triage → report-resolution
 ## Dependencies
 
 - Requires report directory with finding files
-- Requires `KILO_CONFIG_ROOT` for tool access
-- Requires `status-findings.json` for cross-report sync
+- Requires `fixtures/status-findings.json` for cross-report sync
+- Requires Python 3.8+ and the bundled `scripts/` utilities
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `scripts/` Python utilities and `fixtures/` JSON schemas as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helper `~/.config/kilo/tools/build-remediation-queue.mjs` may be used in place of the bundled Python tooling
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 
 - `report-triage` - Classifies In-Progress findings
 - `report-resolution` - Sequential burn-down of findings
-- `build-remediation-queue.mjs` - Mechanical queue construction
+- `scripts/get-findings-by-status.py` - List Open findings to build the queue

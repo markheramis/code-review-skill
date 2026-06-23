@@ -24,7 +24,7 @@ Read the remediation packet returned from the specialist agent. Append a `#### R
 
 ## Inputs
 
-- Report directory under `KILO_REPORT_DIRECTORY`
+- Report directory — defaults to `.ai/reports/`
 - Finding ID
 - Remediation packet (from `remediate-packet`):
   - `remediation_status`
@@ -33,7 +33,7 @@ Read the remediation packet returned from the specialist agent. Append a `#### R
   - `warnings`
   - `files_changed`
   - `stage_results`
-- `KILO_FINDINGS_STATUS` - Status lifecycle fixture
+- Status lifecycle — `fixtures/status-findings.json` (bundled)
 
 ## Output Schema
 

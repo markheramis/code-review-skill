@@ -24,10 +24,10 @@ Write the resolved `Deep Confirmed` value into the report finding's metadata, ap
 
 ## Inputs
 
-- Report directory under `KILO_REPORT_DIRECTORY`
+- Report directory — defaults to `.ai/reports/`
 - `finding_id` - Finding identifier
 - `deep_confirmed` value and evidence from classify/experiment stages
-- `KILO_DEEP_CONFIRMATION_STATUS` - Status lifecycle fixture
+- Deep-confirm status lifecycle — `fixtures/status-deep-confirmation.json` (bundled)
 
 ## Output Schema
 

@@ -31,7 +31,7 @@ Classify every warning surfaced during validation (lint, type-check, test consol
 
 ## Tools
 
-- `~/.config/kilo/tools/classify-warnings.mjs` - Deterministic classification of warnings
+- `references/warning-analysis.md` - Classify compiler/static-analysis warnings into actionable vs informational
 
 ## Output Schema
 
@@ -70,7 +70,7 @@ Classify every warning surfaced during validation (lint, type-check, test consol
    - Check if warning's file/line/rule affected by remediation
    - Warnings on touched lines are `introduced`
    - All other warnings are `pre_existing`
-   - Use `classify-warnings.mjs` for mechanical classification
+   - Use the `references/warning-analysis.md` workflow for classification
 
 3. **Fix introduced warnings**
    - Apply minimal change to silence warning
@@ -117,7 +117,19 @@ remediate-validate → remediate-warn → remediate-cleanup
 
 - Requires implement_result with changed files
 - Requires validate_result with warnings
-- Requires classify-warnings.mjs tool
+- Requires the `references/warning-analysis.md` workflow to be loaded
+- Requires Python 3.8+ and the bundled `scripts/` utilities
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `references/warning-analysis.md` workflow as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helper `~/.config/kilo/tools/classify-warnings.mjs` may be used in place of the bundled Python tooling
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 

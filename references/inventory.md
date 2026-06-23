@@ -21,15 +21,16 @@ This inventory gates whether the review can proceed by ensuring all critical inp
 
 ## Inputs
 
-- Report directory under `KILO_REPORT_DIRECTORY` (directory of finding files)
+- Report directory under the configured report path (defaults to `.ai/reports/`) — see "Kilo backend compatibility" at the end of this file
 - Current working directory and git remote configuration
 - Connected MCP tool list (from the session's available tools)
 - `package.json` or equivalent project manifest
 
 ## Tools
 
-- `~/.config/kilo/tools/lib/git.mjs` — repository host detection and git operations
-- `~/.config/kilo/tools/lib/markdown.mjs` — finding file scanning and frontmatter parsing
+- `scripts/get-reports.py` — list reports with finding status counts
+- `scripts/get-findings-by-status.py` — filter findings by status across the directory
+- `scripts/get-next-finding-id.py` — get the next available `F-NNN` finding ID
 
 ## Output Schema
 
@@ -114,10 +115,10 @@ This inventory gates whether the review can proceed by ensuring all critical inp
 ## Rules
 
 - **Read-only operation** - Never modify files, create branches, or make network calls beyond local reads
-- **Use Kilo tools** - Leverage `tools/lib/git.mjs` and `tools/lib/markdown.mjs`
+- **Use the bundled scripts** - the `scripts/` Python utilities are the canonical implementation; invoke them directly rather than shelling out to external toolchains
 - **Degraded doesn't block** - Main agent decides whether to proceed with degraded readiness
 - **Blocked stops processing** - Workflow cannot continue without critical inputs
-- **Resolve paths absolutely** - Use `~/.config/kilo` or user home directory
+- **Resolve paths absolutely** - use `$REVIEW_REPORT_DIR` when set, otherwise `.ai/reports/` relative to the working directory; never silently fall back to another project's path
 
 ## Integration
 
@@ -129,10 +130,19 @@ This skill is typically called as the first step in:
 
 ## Dependencies
 
-- Requires `KILO_CONFIG_ROOT` environment variable
-- Requires `KILO_REPORT_DIRECTORY` environment variable
-- Requires git repository with remote configured
-- Requires Node.js runtime for tool execution
+- Requires a git repository with remote configured
+- Requires Python 3.8+ to run the bundled `scripts/` utilities
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `scripts/` Python utilities and `fixtures/` JSON schemas as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helpers under `~/.config/kilo/tools/*.mjs` may be used in place of the bundled Python scripts
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 

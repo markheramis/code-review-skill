@@ -39,12 +39,10 @@ A finding gets a work item only after deep confirmation:
 ## Config
 
 - `REPORT_PATH` - Path to the review report (required)
-- `KILO_CONFIG_ROOT` - `~/.config/kilo`
-- `KILO_REPORT_DIRECTORY` - `.ai/reports/`
-- `KILO_TOOLS_PATH` - `<KILO_CONFIG_ROOT>/tools`
-- `KILO_WORK_ITEM_TEMPLATE` - `<KILO_CONFIG_ROOT>/fixtures/issue-template.md`
-- `KILO_FINDINGS_STATUS` - Status lifecycle
-- `KILO_WORKFLOW_MANIFEST` - Workflow manifest
+- Report directory — defaults to `.ai/reports/`
+- Issue template — `fixtures/issue-template.md` (bundled)
+- Status lifecycle — `fixtures/status-findings.json` (bundled)
+- Workflow manifest — `fixtures/workflow-manifest.json` (bundled)
 
 ## Inputs
 
@@ -88,7 +86,7 @@ A finding gets a work item only after deep confirmation:
 ## Workflow
 
 1. **Get findings without issues**
-   - Run `get-findings-without-issue.mjs <report-dir>`
+   - Run `scripts/get-findings-by-status.py --status Open <report-dir>` and filter out findings whose frontmatter `issue` field is already set
    - Read each finding file's frontmatter `issue` field
    - Identify findings needing work items
 
@@ -202,7 +200,19 @@ deep-confirm → create-issues → issue-discussion
 - Requires deep-confirmed findings
 - Requires tracker capability (MCP or CLI)
 - Requires issue template
-- Requires `get-findings-without-issue.mjs` tool
+- Requires Python 3.8+ and `scripts/get-findings-by-status.py` to list candidates
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `scripts/` Python utilities and `fixtures/` templates as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helpers under `~/.config/kilo/tools/*.mjs` may be used in place of the bundled Python scripts
+- `KILO_WORK_ITEM_TEMPLATE` — when set, the issue template path is taken from the Kilo config
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 

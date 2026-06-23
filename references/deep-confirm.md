@@ -32,11 +32,9 @@ This is the gate before issues: only findings with `Deep Confirmed: Yes` or `N/A
 
 ## Config
 
-- `KILO_REPORT_DIRECTORY` - `.ai/reports/`
-- `KILO_CONFIG_ROOT` - `~/.config/kilo`
-- `KILO_TOOLS_PATH` - `<KILO_CONFIG_ROOT>/tools/...`
-- `KILO_DEEP_CONFIRMATION_STATUS` - Status lifecycle
-- `KILO_FINDINGS_STATUS` - Findings status
+- Report directory — defaults to `.ai/reports/`
+- Deep-confirm status lifecycle — `fixtures/status-deep-confirmation.json` (bundled)
+- Findings status lifecycle — `fixtures/status-findings.json` (bundled)
 
 ## Inputs
 
@@ -47,7 +45,7 @@ This is the gate before issues: only findings with `Deep Confirmed: Yes` or `N/A
 
 ### 1. Build Queue
 - Record current revision (`git rev-parse HEAD`)
-- Run `get-unconfirmed-findings.mjs <report-dir>`
+- Run `scripts/get-findings-by-status.py --status Open <report-dir>` to list candidate findings
 - Find findings with `deep_confirmed: No`/missing
 - Treat missing field as unconfirmed, add field when recording
 
@@ -137,7 +135,19 @@ code-review → deep-confirm → create-issues
 - Requires unconfirmed findings from report directory
 - Requires access to all deep confirmation sub-skills
 - Requires git repository access
-- Requires `get-unconfirmed-findings.mjs` tool
+- Requires Python 3.8+ and `scripts/get-findings-by-status.py` to list candidates
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `scripts/` Python utilities and `fixtures/` JSON schemas as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helpers under `~/.config/kilo/tools/*.mjs` may be used in place of the bundled Python scripts
+- `KILO_DEEP_CONFIRMATION_STATUS` — when set, the deep-confirm status lifecycle fixture is taken from the Kilo config
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 

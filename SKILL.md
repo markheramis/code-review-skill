@@ -178,14 +178,24 @@ When writing a finding:
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `KILO_REPORT_DIRECTORY` | `.ai/reports/` | Where findings are saved |
-| `KILO_CONFIG_ROOT` | `~/.config/kilo` | Original Kilo config root (kept for compatibility) |
-| `KILO_REPORT_TEMPLATE` | `<KILO_CONFIG_ROOT>/fixtures/report-template.md` | Single-finding template |
-| `KILO_TOOLS_PATH` | `<KILO_CONFIG_ROOT>/tools/` | Node-based Kilo tooling |
-| `KILO_FINDINGS_STATUS` | `<KILO_CONFIG_ROOT>/fixtures/status-findings.json` | Status lifecycle |
-| `KILO_DEEP_CONFIRMATION_STATUS` | `<KILO_CONFIG_ROOT>/fixtures/status-deep-confirmation.json` | Deep-confirm state |
+| `REVIEW_REPORT_DIR` | `.ai/reports/` | Where findings are saved (preferred) |
+| `KILO_REPORT_DIRECTORY` | `.ai/reports/` | Alias for `REVIEW_REPORT_DIR`; honored when the Kilo orchestrator is installed |
 
-`KILO_*` variables are honored for users who have Kilo installed. When absent, the skill falls back to the bundled `fixtures/` and `scripts/` directories and saves reports under the project-local `.ai/reports/` (or wherever the user specifies).
+The skill ships with a complete bundled configuration in `fixtures/` (templates, JSON schemas) and `scripts/` (Python utilities). No external toolchain is required to use the skill.
+
+### Optional Kilo backend compatibility
+
+If the Kilo orchestrator is installed at `~/.config/kilo/`, the following additional variables may be set to point the skill at the Kilo backend:
+
+| Variable | Purpose |
+|----------|---------|
+| `KILO_CONFIG_ROOT` | Path to `~/.config/kilo` (defaults to that path) |
+| `KILO_TOOLS_PATH` | Path to the Kilo Node.js helpers (`<KILO_CONFIG_ROOT>/tools/*.mjs`) |
+| `KILO_REPORT_TEMPLATE` | Single-finding template path |
+| `KILO_FINDINGS_STATUS` | Findings status lifecycle fixture |
+| `KILO_DEEP_CONFIRMATION_STATUS` | Deep-confirm status fixture |
+
+When `KILO_*` variables are set, the skill prefers the Kilo backend's helpers where they exist; when unset (the default), the skill runs entirely against the bundled `fixtures/` and `scripts/` directories. Node.js and `~/.config/kilo/` are never required.
 
 ## Reference Catalog
 

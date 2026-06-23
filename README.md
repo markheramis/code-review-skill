@@ -166,14 +166,24 @@ The skill will:
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `KILO_REPORT_DIRECTORY` | `.ai/reports/` | Where findings are saved |
-| `KILO_CONFIG_ROOT` | `~/.config/kilo` | Original Kilo config root (kept for compatibility) |
-| `KILO_REPORT_TEMPLATE` | `<KILO_CONFIG_ROOT>/fixtures/report-template.md` | Single-finding template |
-| `KILO_TOOLS_PATH` | `<KILO_CONFIG_ROOT>/tools/` | Node-based Kilo tooling |
-| `KILO_FINDINGS_STATUS` | `<KILO_CONFIG_ROOT>/fixtures/status-findings.json` | Status lifecycle |
-| `KILO_DEEP_CONFIRMATION_STATUS` | `<KILO_CONFIG_ROOT>/fixtures/status-deep-confirmation.json` | Deep-confirm state |
+| `REVIEW_REPORT_DIR` | `.ai/reports/` | Where findings are saved (preferred) |
+| `KILO_REPORT_DIRECTORY` | `.ai/reports/` | Alias for `REVIEW_REPORT_DIR`; honored when the Kilo orchestrator is installed |
 
-When the `KILO_*` variables point at an installed Kilo config, the skill uses them. When they are absent, the skill falls back to the bundled `fixtures/` and `scripts/` directories.
+The skill ships with a complete bundled configuration in `fixtures/` and `scripts/`. **No external toolchain is required** to use the skill — Python 3.8+ and the bundled scripts are sufficient.
+
+### Optional Kilo backend compatibility
+
+If the Kilo orchestrator is installed at `~/.config/kilo/`, the following additional variables may be set to point the skill at the Kilo backend:
+
+| Variable | Purpose |
+|----------|---------|
+| `KILO_CONFIG_ROOT` | Path to `~/.config/kilo` (defaults to that path) |
+| `KILO_TOOLS_PATH` | Path to the Kilo Node.js helpers (`<KILO_CONFIG_ROOT>/tools/*.mjs`) |
+| `KILO_REPORT_TEMPLATE` | Single-finding template path |
+| `KILO_FINDINGS_STATUS` | Findings status lifecycle fixture |
+| `KILO_DEEP_CONFIRMATION_STATUS` | Deep-confirm status fixture |
+
+When `KILO_*` variables are set, the skill prefers the Kilo backend's helpers where they exist; when unset (the default), the skill runs entirely against the bundled `fixtures/` and `scripts/` directories. Node.js and `~/.config/kilo/` are never required.
 
 ## Evidence-first principles
 

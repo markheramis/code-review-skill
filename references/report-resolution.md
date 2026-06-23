@@ -24,13 +24,11 @@ Sequentially burn down resolvable findings as a bounded sequential queue around 
 
 ## Config
 
-- `KILO_REPORT_DIRECTORY` - `.ai/reports/`
-- `KILO_CONFIG_ROOT` - `~/.config/kilo`
-- `KILO_TOOLS_PATH` - `<KILO_CONFIG_ROOT>/tools/...`
-- `KILO_FINDINGS_STATUS` - Status lifecycle
-- `KILO_ISSUE_STATUS` - Issue lifecycle
-- `KILO_COMMIT_TEMPLATE` - Commit message template
-- `KILO_PR_TEMPLATE` - Pull request template
+- Report directory — defaults to `.ai/reports/`
+- Status lifecycle — `fixtures/status-findings.json` (bundled)
+- Issue status lifecycle — `fixtures/status-issues.json` (bundled)
+- Commit message template — `fixtures/commit-template.md` (bundled)
+- Pull request template — `fixtures/pull-request-template.md` (bundled)
 
 ## Inputs
 
@@ -147,6 +145,20 @@ report-queue → report-triage → report-resolution → report-finalize
 - Requires access to all workflow skills
 - Requires git repository with remote
 - Requires issue/change request system access
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `fixtures/` and `scripts/` as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helpers under `~/.config/kilo/tools/*.mjs` may be used in place of the bundled Python scripts
+- `KILO_COMMIT_TEMPLATE` — when set, the commit message template is taken from the Kilo config
+- `KILO_PR_TEMPLATE` — when set, the pull request template is taken from the Kilo config
+- `KILO_ISSUE_STATUS` — when set, the issue status lifecycle fixture is taken from the Kilo config
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 

@@ -30,7 +30,8 @@ Build a focus areas list and a Prior Findings Index from existing reports in the
 
 ## Tools
 
-- `~/.config/kilo/tools/lib/markdown.mjs` - Finding file scanning
+- `scripts/get-findings-by-status.py` - Filter findings by status across the report directory
+- `scripts/get-reports.py` - List all reports with finding counts
 - `git log` - Changed area detection
 - `git diff` - Coverage gap analysis
 
@@ -137,7 +138,18 @@ inventory → baseline-map → risk-scan (parallel)
 
 - Requires completed `inventory` with report directory
 - Requires git repository with history
-- Requires `KILO_CONFIG_ROOT` for tool access
+- Requires Python 3.8+ to run the bundled `scripts/` utilities
+- Does NOT require Node.js, Kilo, or any `KILO_*` environment variable to be set
+
+## Kilo backend compatibility
+
+This reference uses the bundled `scripts/` Python utilities as the canonical implementation. If the Kilo orchestrator is installed at `~/.config/kilo/`, the following `KILO_*` environment variables are honored as a compatible backend:
+
+- `KILO_REPORT_DIRECTORY` — overrides the default `.ai/reports/` save path
+- `KILO_CONFIG_ROOT` — when set, points at the Kilo fixtures and tools
+- `KILO_TOOLS_PATH` — when set, the Node.js helpers under `~/.config/kilo/tools/*.mjs` may be used in place of the bundled Python scripts
+
+When `KILO_*` variables are unset (the default), this reference works against the bundled `fixtures/` and `scripts/` directories only. Node.js and `~/.config/kilo/` are never required.
 
 ## See Also
 
